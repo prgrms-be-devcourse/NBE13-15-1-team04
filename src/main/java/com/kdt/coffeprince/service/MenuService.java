@@ -6,6 +6,8 @@ import com.kdt.coffeprince.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MenuService {
@@ -14,5 +16,12 @@ public class MenuService {
     public MenuResponse one(Long id) {
         Menu menu = this.menuRepository.findById(id).orElseThrow();
         return MenuResponse.from(menu);
+    }
+
+    public List<MenuResponse> all() {
+        return this.menuRepository.findAll()
+                .stream()
+                .map(MenuResponse::from)
+                .toList();
     }
 }
