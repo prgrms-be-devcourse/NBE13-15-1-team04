@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.controller;
 
+import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,7 @@ public class MenuController {
     private final MenuService menuService;
 
     @GetMapping("/{id}")
-    public Object getMenu(@PathVariable("id") Long id) {
-        return null;
+    public MenuResponse getMenu(@PathVariable("id") Long id) {
+        return this.menuService.one(id);
     }
 }
