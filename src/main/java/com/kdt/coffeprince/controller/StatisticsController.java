@@ -2,8 +2,9 @@ package com.kdt.coffeprince.controller;
 
 import com.kdt.coffeprince.dto.OrderStatistics;
 import com.kdt.coffeprince.service.StatisticsService;
-import jakarta.validation.constraints.PastOrPresent;
+import com.kdt.coffeprince.util.DateUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +24,12 @@ public class StatisticsController {
     public ResponseEntity<OrderStatistics> getOrderStatistics(
             @RequestParam(value = "date", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            @PastOrPresent
             LocalDate date
-    ) {
-        return ResponseEntity.ok(statisticsService.getOrderStatisticsByDate(date));
+    ) throws BadRequestException {
+        LocalDate targetDate = DateUtils.getOrDefault(date);
+        if (DateUtils.isFuture(targetDate)) {
+            throw new BadRequestException("미래 날짜는 조회할 수 없습니다");
+        }
+        return ResponseEntity.ok(statisticsService.getOrderStatisticsByDate(targetDate));
     }
 }
