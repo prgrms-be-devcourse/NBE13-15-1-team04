@@ -4,6 +4,7 @@ import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.entity.Menu;
+import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,15 @@ public class MenuService {
                 .stream()
                 .map(MenuResponse::from)
                 .toList();
+    }
+
+    // A21: 판매 여부 변경
+    @Transactional
+    public MenuResponse changeAvailability(Long menuId, boolean available) {
+        Menu menu = this.menuRepository.findById(menuId)
+                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다."));
+        menu.changeAvailability(available);
+        return MenuResponse.from(menu);
     }
 
 }

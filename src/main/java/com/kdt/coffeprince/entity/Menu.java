@@ -52,4 +52,9 @@ public class Menu {
         this.description = description;
     }
 
+    // A21: 판매 여부만 변경
+    public void changeAvailability(boolean available) {
+        this.isAvailable = available;
+    }
+
 }
