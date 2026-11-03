@@ -1,11 +1,14 @@
 package com.kdt.coffeprince.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "order_item")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +34,4 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    protected OrderItem() {
-    }
 }
