@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,10 +13,12 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "category")
+@EntityListeners(AuditingEntityListener.class)
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "category_id")
     private Long id;
 
     @Column(length = 50)
@@ -37,6 +40,14 @@ public class Category {
     private List<Menu> menus = new ArrayList<>();
 
     protected Category() {
+    }
+
+    public Category(String name) {
+        this.name = name;
+    }
+
+    public void rename(String name) {
+        this.name = name;
     }
 
 }
