@@ -1,19 +1,25 @@
 package com.kdt.coffeprince.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "menu")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "menu_id")
+    private Long menuId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -38,7 +44,6 @@ public class Menu {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
 
 }
 

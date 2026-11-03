@@ -28,7 +28,7 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> findAll() {
-        return categoryRepository.findAllByOrderByIdAsc().stream()
+        return categoryRepository.findAllByOrderByCategoryIdAsc().stream()
                 .map(CategoryResponse::from)
                 .toList();
     }
@@ -52,7 +52,7 @@ public class CategoryService {
         Category category = getOrThrow(id);
         String name = request.name().trim();
 
-        if (categoryRepository.existsByNameAndIdNot(name, id)) {
+        if (categoryRepository.existsByNameAndCategoryIdNot(name, id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "카테고리 중복");
         }
         category.rename(name);
