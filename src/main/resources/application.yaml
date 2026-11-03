@@ -1,16 +1,10 @@
 spring:
-  config:
-    import: "file:./.env[.properties]"
   application:
     name: coffe-prince
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+  profiles:
+    default: local
   jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true

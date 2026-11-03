@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: "optional:file:./prod.env[.properties]"
+  datasource:
+    # 기본값 없음: prod.env 나 환경 변수에 값이 없으면 기동 실패
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  sql:
+    init:
+      mode: never

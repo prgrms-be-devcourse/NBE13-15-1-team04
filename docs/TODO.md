@@ -25,6 +25,8 @@
 - [ ] `Category.menus`의 `cascade = ALL, orphanRemoval = true` 재검토
   - 카테고리를 삭제하면 메뉴가 같이 삭제됨. 의도한 동작인지 확인 필요
 - [ ] `Menu.id` → `menuId` + `@Column(name = "menu_id")` (PK는 `xxxId` 규칙으로 통일)
+- [ ] 위 두 PK 컬럼명을 바꿀 때 `src/main/resources/db/data-local.sql`의 `id` → `category_id` / `menu_id`도 같이 수정
+  - 초기 데이터 SQL은 Hibernate가 엔티티에서 만드는 컬럼명을 그대로 쓰고 있음
 
 ## DTO / 서비스
 
