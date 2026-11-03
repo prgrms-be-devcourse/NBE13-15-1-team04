@@ -1,0 +1,22 @@
+spring:
+  config:
+    # 없으면 아래 기본값 사용
+    import: "optional:file:./local.env[.properties]"
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/coffeprince}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    hikari:
+      # DB 가 아직 안 떠 있으면 이 시간(ms) 동안 재시도 후 실패
+      initialization-fail-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    # Hibernate 가 테이블을 만든 뒤에 data-local.sql 실행
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/data-local.sql
+      encoding: UTF-8
