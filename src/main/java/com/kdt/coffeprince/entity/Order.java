@@ -33,14 +33,15 @@ public class Order {
     @Column(name = "customer_email", nullable = false, length = 100)
     private String customerEmail;
 
-    @Column(name = "customer_name", nullable = false, length = 50)
-    private String customerName;
-
     @Column(name = "customer_phone", length = 20)
     private String customerPhone;
 
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
+
+    // 우편번호: 숫자 5자리. "01234"처럼 앞의 0을 지키려고 문자열로 저장
+    @Column(nullable = false, length = 5)
+    private String postcode;
 
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;
@@ -70,5 +71,10 @@ public class Order {
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
+
+    // A22: 메모만 변경. 공백·줄바꿈을 그대로 저장(trim 안 함), ""는 비우기
+    public void changeMemo(String memo) {
+        this.memo = memo;
+    }
 
 }

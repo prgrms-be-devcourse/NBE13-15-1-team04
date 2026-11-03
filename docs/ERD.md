@@ -32,9 +32,9 @@ erDiagram
         BIGINT order_id PK "AUTO_INCREMENT"
         BIGINT reorder_source_id FK "NULL, 재주문 원본 (A23)"
         VARCHAR(100) customer_email "NOT NULL (A12, A24)"
-        VARCHAR(50) customer_name "NOT NULL"
         VARCHAR(20) customer_phone
         VARCHAR(255) delivery_address "NOT NULL"
+        VARCHAR(5) postcode "NOT NULL, 숫자 5자리 문자열"
         DATE delivery_date "NOT NULL"
         VARCHAR(255) memo "(A22)"
         ENUM status "NOT NULL, PLACED / CANCELED, DEFAULT PLACED"
