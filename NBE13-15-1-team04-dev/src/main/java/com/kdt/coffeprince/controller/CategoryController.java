@@ -2,10 +2,8 @@ package com.kdt.coffeprince.controller;
 
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
-import com.kdt.coffeprince.dto.CategoryUpdateRequest;
 import com.kdt.coffeprince.service.CategoryService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
-
-    private static final String INVALID_ID = "카테고리 ID는 1 이상의 정수여야 합니다.";
 
     private final CategoryService categoryService;
 
@@ -40,14 +36,14 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")                  // A04
-    public CategoryResponse update(@PathVariable @Positive(message = INVALID_ID) Long categoryId,
-                                   @Valid @RequestBody CategoryUpdateRequest request) {
+    public CategoryResponse update(@PathVariable Long categoryId,
+                                   @Valid @RequestBody CategoryRequest request) {
         return categoryService.update(categoryId, request);
     }
 
     @DeleteMapping("/{categoryId}")               // A05
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
+    public void delete(@PathVariable Long categoryId) {
         categoryService.delete(categoryId);
     }
 }

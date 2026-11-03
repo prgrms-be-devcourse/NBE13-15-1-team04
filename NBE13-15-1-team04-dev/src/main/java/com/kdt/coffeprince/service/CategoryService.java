@@ -2,7 +2,6 @@ package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
-import com.kdt.coffeprince.dto.CategoryUpdateRequest;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
@@ -48,7 +47,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse update(Long id, CategoryUpdateRequest request) {
+    public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = getOrThrow(id);
         String name = request.name().trim();
 
@@ -62,11 +61,11 @@ public class CategoryService {
 
     @Transactional
     public void delete(Long id) {
-        getOrThrow(id);
-        if (categoryRepository.countMenusByCategoryId(id) > 0) {
+        Category category = getOrThrow(id);
+        if (menuRepository.existsByCategoryId(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "사용중인 카테고리");
         }
-        categoryRepository.deleteCategoryById(id);
+        categoryRepository.delete(category);
     }
 
     public boolean exists(Long id) {
