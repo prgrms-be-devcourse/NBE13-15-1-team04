@@ -13,7 +13,7 @@ import java.time.Instant;
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long menuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -39,6 +39,12 @@ public class Menu {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    public void update(Category category,String name,int price,String description){
+        this.category = category;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
 
 }
 
