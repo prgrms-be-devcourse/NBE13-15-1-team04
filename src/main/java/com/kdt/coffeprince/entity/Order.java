@@ -73,6 +73,10 @@ public class Order {
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
+    public boolean isPlaced() {
+        return this.status == OrderStatus.PLACED;
+    }
+
     // A22: 메모만 변경. 공백·줄바꿈을 그대로 저장(trim 안 함), ""는 비우기
     public void changeMemo(String memo) {
         this.memo = memo;
@@ -81,7 +85,7 @@ public class Order {
     // A16: 취소 마감 = 저장된 배송일의 서울 시각 14:00:00. 13:59:59까지의 PLACED 주문만 취소 가능
     public boolean isCancellableAt(Instant now) {
         Instant deadline = deliveryDate.atTime(14, 0).atZone(DateUtils.ZONE).toInstant();
-        return status == OrderStatus.PLACED && now.isBefore(deadline);
+        return isPlaced() && now.isBefore(deadline);
     }
 
     // A16: 상태와 취소 시각만 변경 (주문·항목·금액은 그대로)
