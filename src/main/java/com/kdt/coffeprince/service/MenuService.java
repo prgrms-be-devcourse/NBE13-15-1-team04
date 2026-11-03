@@ -1,11 +1,11 @@
 package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.dto.MenuResponse;
-import com.kdt.coffeprince.entity.Menu;
-import com.kdt.coffeprince.repository.MenuRepository;
 import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;
+import com.kdt.coffeprince.entity.Menu;
 import com.kdt.coffeprince.repository.CategoryRepository;
+import com.kdt.coffeprince.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +30,9 @@ public class MenuService {
                 .map(MenuResponse::from)
                 .toList();
     }
+
     @Transactional
-    public MenuResponse updateMenu(Long menuId,PutMenuRequest body){
+    public MenuResponse updateMenu(Long menuId, PutMenuRequest body) {
         Menu menu = this.menuRepository.findById(menuId).orElseThrow();
 
         Category category = this.categoryRepository.findById(body.categoryId()).orElseThrow();
@@ -44,10 +45,11 @@ public class MenuService {
         );
         return MenuResponse.from(menu);
     }
-    public List<MenuResponse> available(){
+
+    public List<MenuResponse> available() {
         return this.menuRepository.findByIsAvailableTrue()
                 .stream()
-                .map(MenuResonse::from)
+                .map(MenuResponse::from)
                 .toList();
     }
 
