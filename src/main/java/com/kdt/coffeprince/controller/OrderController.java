@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +34,11 @@ public class OrderController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "메모는 200자 이하로 입력해 주세요.");
         }
         return orderService.changeMemo(orderId, memo);
+    }
+
+    @PostMapping("/{orderId}/cancel")              // A16 (요청 본문 없음)
+    public OrderResponse cancel(
+            @PathVariable @Positive(message = "주문 ID는 1 이상의 정수여야 합니다.") Long orderId) {
+        return orderService.cancel(orderId);
     }
 }

@@ -1,6 +1,7 @@
 package com.kdt.coffeprince.entity;
 
 import com.kdt.coffeprince.constant.OrderStatus;
+import com.kdt.coffeprince.util.DateUtils;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -75,6 +76,18 @@ public class Order {
     // A22: 메모만 변경. 공백·줄바꿈을 그대로 저장(trim 안 함), ""는 비우기
     public void changeMemo(String memo) {
         this.memo = memo;
+    }
+
+    // A16: 취소 마감 = 저장된 배송일의 서울 시각 14:00:00. 13:59:59까지의 PLACED 주문만 취소 가능
+    public boolean isCancellableAt(Instant now) {
+        Instant deadline = deliveryDate.atTime(14, 0).atZone(DateUtils.ZONE).toInstant();
+        return status == OrderStatus.PLACED && now.isBefore(deadline);
+    }
+
+    // A16: 상태와 취소 시각만 변경 (주문·항목·금액은 그대로)
+    public void cancel(Instant now) {
+        this.status = OrderStatus.CANCELED;
+        this.canceledAt = now;
     }
 
 }
