@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record CategoryResponse(Long id, String name) {
     public static CategoryResponse from(Category c) {
-        return new CategoryResponse(c.getId(), c.getName());
+        return new CategoryResponse(c.getCategoryId(), c.getName());
     }
 }
 
