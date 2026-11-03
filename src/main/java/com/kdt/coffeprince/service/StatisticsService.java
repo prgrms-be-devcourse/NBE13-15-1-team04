@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.service;
 
+import com.kdt.coffeprince.dto.MenuStatistics;
 import com.kdt.coffeprince.dto.OrderStatistics;
 import com.kdt.coffeprince.entity.Order;
 import com.kdt.coffeprince.repository.OrderRepository;
