@@ -1,6 +1,5 @@
 package com.kdt.coffeprince.dto;
 
-import com.kdt.coffeprince.constant.OrderStatus;
 import com.kdt.coffeprince.entity.Order;
 import com.kdt.coffeprince.entity.OrderItem;
 
@@ -17,7 +16,7 @@ public record OrderStatistics(
 ) {
     public static OrderStatistics from(LocalDate date, List<Order> orders) {
         List<Order> placed = orders.stream()
-                .filter(order -> order.getStatus() == OrderStatus.PLACED)
+                .filter(Order::isPlaced)
                 .toList();
 
         int totalQuantity = 0;

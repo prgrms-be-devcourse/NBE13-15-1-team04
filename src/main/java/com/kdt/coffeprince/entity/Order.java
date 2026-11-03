@@ -71,4 +71,8 @@ public class Order {
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
+    public boolean isPlaced() {
+        return this.status == OrderStatus.PLACED;
+    }
+
 }
