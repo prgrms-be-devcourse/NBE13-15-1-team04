@@ -1,4 +1,9 @@
 package com.kdt.coffeprince.dto;
 
-public class CreateMenuRequest {
+public record CreateMenuRequest(
+        Long categoryId,
+        String name,
+        Integer price,
+        String description
+) {
 }
