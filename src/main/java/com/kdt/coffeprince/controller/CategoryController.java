@@ -3,6 +3,7 @@ package com.kdt.coffeprince.controller;
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
 import com.kdt.coffeprince.dto.CategoryUpdateRequest;
+import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.service.CategoryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -31,6 +32,11 @@ public class CategoryController {
     @GetMapping("/{categoryId}")                  // A02
     public CategoryResponse get(@PathVariable Long categoryId) {
         return categoryService.find(categoryId);
+    }
+
+    @GetMapping("/{categoryId}/menus")            // A15
+    public List<MenuResponse> menus(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
+        return categoryService.findMenus(categoryId);
     }
 
     @PostMapping                                  // A03

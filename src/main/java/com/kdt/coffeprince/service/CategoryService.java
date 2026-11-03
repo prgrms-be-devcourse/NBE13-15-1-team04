@@ -3,6 +3,8 @@ package com.kdt.coffeprince.service;
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
 import com.kdt.coffeprince.dto.CategoryUpdateRequest;
+import com.kdt.coffeprince.dto.MenuResponse;
+import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
@@ -35,6 +37,16 @@ public class CategoryService {
 
     public CategoryResponse find(Long id) {
         return CategoryResponse.from(getOrThrow(id));
+    }
+
+    // A15: 카테고리별 메뉴 목록
+    public List<MenuResponse> findMenus(Long categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new NotFoundException("카테고리를 찾을 수 없습니다.");
+        }
+        return menuRepository.findAllByCategory_CategoryIdOrderByMenuIdAsc(categoryId).stream()
+                .map(MenuResponse::from)
+                .toList();
     }
 
     @Transactional

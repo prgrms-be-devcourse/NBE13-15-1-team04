@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findByIsAvailableTrue();
+    List<Menu> findAllByCategory_CategoryIdOrderByMenuIdAsc(Long categoryId);
 }
