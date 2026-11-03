@@ -21,11 +21,21 @@ public class StatisticsService {
     @Transactional(readOnly = true)
     public OrderStatistics getOrderStatisticsByDate(LocalDate date) {
         // TODO: LocalDate, Instant 통일할지 아니면 변환 로직을 유틸리티로 뺄지 결정
+        Instant start = DateUtils.startOf(date);
+        Instant end = DateUtils.startOfNextDay(date);
 
-        Instant start = date.atStartOfDay(DateUtils.ZONE).toInstant();
-        Instant end = date.plusDays(1).atStartOfDay(DateUtils.ZONE).toInstant();
         List<Order> orders = this.orderRepository.findAllOrderedOn(start, end);
 
         return OrderStatistics.from(date, orders);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MenuStatistics> getMenuStatisticsByDate(LocalDate date) {
+        Instant start = DateUtils.startOf(date);
+        Instant end = DateUtils.startOfNextDay(date);
+
+        List<Order> orders = this.orderRepository.findAllOrderedOn(start, end);
+        List<Order> placedOrders = orders.stream().filter(Order::isPlaced).toList();
+        return MenuStatistics.listFrom(placedOrders);
     }
 }

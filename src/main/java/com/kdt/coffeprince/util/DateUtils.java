@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.util;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -22,5 +23,13 @@ public class DateUtils {
      */
     public static boolean isFuture(LocalDate date) {
         return date.isAfter(today());
+    }
+
+    public static Instant startOf(LocalDate date) {
+        return date.atStartOfDay(ZONE).toInstant();
+    }
+
+    public static Instant startOfNextDay(LocalDate date) {
+        return date.plusDays(1).atStartOfDay(ZONE).toInstant();
     }
 }
