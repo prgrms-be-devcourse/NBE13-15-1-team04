@@ -47,7 +47,7 @@ public class MenuService {
     public List<MenuResponse> available(){
         return this.menuRepository.findByIsAvailableTrue()
                 .stream()
-                .map(MenuResonse::from)
+                .map(MenuResponse::from)
                 .toList();
     }
 
