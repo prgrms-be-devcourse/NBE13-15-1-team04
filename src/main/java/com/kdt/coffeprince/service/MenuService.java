@@ -6,6 +6,7 @@ import com.kdt.coffeprince.repository.MenuRepository;
 import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
+import com.kdt.coffeprince.dto.CreateMenuRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,36 @@ public class MenuService {
     }
     public List<MenuResponse> available(){
         return this.menuRepository.findByIsAvailableTrue()
+                .stream()
+                .map(MenuResponse::from)
+                .toList();
+    }
+    @Transactional
+    public MenuResponse createMenu(CreateMenuRequest body) {
+        Category category = categoryRepository.findById(body.categoryId())
+                .orElseThrow();
+
+        Menu menu = new Menu(
+                category,
+                body.name(),
+                body.price(),
+                body.description()
+        );
+
+        Menu savedMenu = menuRepository.save(menu);
+
+        return MenuResponse.from(savedMenu);
+    }
+    @Transactional
+    public void deleteMenu(Long menuId) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow();
+
+        menuRepository.delete(menu);
+    }
+    @Transactional(readOnly = true)
+    public List<MenuResponse> searchMenus(String name) {
+        return menuRepository.findByNameContainingIgnoreCase(name)
                 .stream()
                 .map(MenuResponse::from)
                 .toList();

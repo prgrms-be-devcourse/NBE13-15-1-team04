@@ -3,6 +3,7 @@ package com.kdt.coffeprince.controller;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.service.MenuService;
 import com.kdt.coffeprince.dto.PutMenuRequest;
+import com.kdt.coffeprince.dto.CreateMenuRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -38,5 +44,19 @@ public class MenuController {
     public MenuResponse updateMenu(@PathVariable("id") Long id , @RequestBody PutMenuRequest body){
         return menuService.updateMenu(id,body);
 
+    }
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public MenuResponse createMenu(@RequestBody CreateMenuRequest body) {
+        return menuService.createMenu(body);
+    }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMenu(@PathVariable("id") Long id) {
+        menuService.deleteMenu(id);
+    }
+    @GetMapping("/search")
+    public List<MenuResponse> searchMenus(@RequestParam("name") String name) {
+        return menuService.searchMenus(name);
     }
 }
