@@ -6,8 +6,13 @@ public record MenuResponse(Long id, Long categoryId, String name, Integer price,
                            Boolean available) {
 
     public static MenuResponse from(Menu menu) {
-
-        return new MenuResponse(menu.getMenuId(), menu.getCategory().getCategoryId(), menu.getName(),
-                menu.getPrice(), menu.getDescription(), menu.getIsAvailable());
+        return new MenuResponse(
+                menu.getMenuId(),
+                menu.getCategory().getCategoryId(),
+                menu.getName(),
+                menu.getPrice(),
+                menu.getDescription(),
+                menu.getIsAvailable()
+        );
     }
 }

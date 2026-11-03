@@ -51,5 +51,14 @@ public class Menu {
         this.price = price;
         this.description = description;
     }
+    public Menu(Category category, String name, Integer price, String description) {
+        this.category = category;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.isAvailable = true;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
 
 }
