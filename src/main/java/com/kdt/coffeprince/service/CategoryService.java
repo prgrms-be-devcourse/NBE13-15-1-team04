@@ -64,7 +64,7 @@ public class CategoryService {
         Category category = getOrThrow(id);
         String name = request.name().trim();
 
-        if (categoryRepository.existsByNameAndCategoryIdNot(name, id)) {
+        if (categoryRepository.countSameNameExactly(name, id) > 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "카테고리 중복");
         }
         category.rename(name);
