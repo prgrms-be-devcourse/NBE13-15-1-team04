@@ -1,61 +1,74 @@
 # TODO
 
-주문 도메인(`Order`, `OrderItem`) 작업 중 발견했지만, 충돌 방지를 위해 다른 작업자의 파일은 건드리지 않고 기록만 해 둔 항목입니다.
-각 항목은 `ERD.md`의 최종 구조를 기준으로 합니다.
+`requests/api-check.http`로 전체 API를 실서버에 실행해 보고 발견한 항목입니다. (2026-11-04 기준)
+명세: 오류 응답은 `code·message·fieldErrors`를 포함하고, 400·404·409의 code·message는 오류 응답 표를 따른다. 내부 오류만 500.
 
-## 공통 (현재는 엔티티 뼈대만 작성된 상태)
+파일 담당자가 다른 경우 직접 고치지 않고 여기에 기록만 해 두었습니다. 재현 요청은 `.http` 파일의 같은 번호 (A07 등) 항목을 실행하면 됩니다.
 
-- [x] 모든 엔티티에 `@NoArgsConstructor(access = PROTECTED)` 추가
-  - `@Builder`는 사용하지 않기로 함. 객체 생성용 생성자는 도메인 메서드 작업 시 함께 작성
-- [ ] `Order` 도메인 메서드
-  - 항목 추가: 양방향 연관관계 세팅 + `totalAmount` 갱신을 한 곳에서 처리
-  - 취소: `status = CANCELED`와 `canceledAt` 설정을 함께 처리, 중복 취소 방지
-  - `getItems()`는 불변 리스트로 반환해 `totalAmount`와 어긋나는 외부 수정 방지
-- [ ] `OrderItem` 생성 시 `Menu`에서 `menuName`, `unitPrice` 스냅샷 복사, `quantity < 1` 검증
+## 1. 500 이 나는 버그 (우선 수정)
 
-## Category / Menu 엔티티
+- [ ] **A07 메뉴 상세** — 존재하지 않는 메뉴 ID·ID 0 으로 조회하면 500
+    - 원인: `MenuService.one()`의 `orElseThrow()`가 예외 없이 호출돼 `NoSuchElementException` 발생, 처리기 없음
+    - 기대: 404 `MENU_NOT_FOUND` / ID 0 은 400 `VALIDATION_ERROR`
+- [ ] **A13 주문 상세** — 존재하는 주문을 조회해도 500
+    - 원인 (추정): `OrderService.find()`에 `@Transactional`이 없고 `open-in-view=false` 라 `OrderResponse.from()`에서
+      `order.getItems()` 지연 로딩 실패
+    - 기대: 200 전체 Order. `@Transactional(readOnly = true)` 또는 items fetch join 으로 해결
+- [ ] **A14 배송 묶음** — PLACED 주문이 있는 날짜로 조회하면 500 (주문 없는 날짜는 200 `[]`)
+    - 원인 (추정): A13 과 동일. `OrderService.findDeliveryBatches()`에서 `order.getItems()` 지연 로딩 실패
+- [ ] **A10 메뉴 삭제** — 주문에 사용된 메뉴를 삭제하면 500
+    - 원인: `order_item.menu_id` FK 위반 (`DataIntegrityViolationException`). 삭제 전 주문 사용 여부 검사가 없음
+    - 기대: 409 `MENU_IN_USE` (취소된 주문에 쓰인 메뉴도 포함)
 
-- [x] `Category`, `Menu`에 `@EntityListeners(AuditingEntityListener.class)` 추가
-  - `@CreatedDate` / `@LastModifiedDate`는 리스너가 있어야 값이 채워짐. 없으면 `created_at NOT NULL` 때문에 INSERT 실패
-  - `@EnableJpaAuditing`은 `config/JpaConfig.java`에 이미 있음
-- [x] `Category.id` → `categoryId` + `@Column(name = "category_id")` (PK는 `xxxId` 규칙으로 통일)
-- [x] `Category.name`에 `nullable = false` (DDL `NOT NULL`)
-- [x] `Category.createdAt`에 `updatable = false`, `Category.updatedAt`에 `nullable = false` (DDL 기준)
-- [x] `Category.menus`의 `cascade = ALL, orphanRemoval = true` 재검토
-  - 카테고리를 삭제하면 메뉴가 같이 삭제됨. 의도한 동작인지 확인 필요
-  - → `ERD.md`(RESTRICT)와 `CategoryService.delete`(메뉴 있으면 409)에 맞춰 cascade/orphanRemoval 제거
-- [x] `Menu.id` → `menuId` + `@Column(name = "menu_id")` (PK는 `xxxId` 규칙으로 통일)
-- [x] 위 두 PK 컬럼명을 바꿀 때 `src/main/resources/db/data-local.sql`의 `id` → `category_id` / `menu_id`도 같이 수정
-  - 초기 데이터 SQL은 Hibernate가 엔티티에서 만드는 컬럼명을 그대로 쓰고 있음
+## 2. 상태 코드는 맞지만 응답 형식이 명세와 다른 것
 
-## DTO / 서비스
+### MenuController (A07·A08·A09·A10·A20·A21)
 
-- [x] `MenuResponse.from()`의 `menu.getId()` → `menu.getMenuId()`, `category.getId()` → `category.getCategoryId()`
-  - 위 PK 네이밍 통일과 함께 수정해야 컴파일됨
-  - `CategoryResponse.from()`, `CategoryRepository`의 derived query(`...ByCategoryId...`)·JPQL도 함께 수정
-- [x] 주문 목록 조회 시 `Order.items` N+1 대비
-  - fetch join 또는 `spring.jpa.properties.hibernate.default_batch_fetch_size` 설정
-  - → `application.yaml`에 `default_batch_fetch_size: 100` 추가. 목록 API 작성 시 fetch join 필요 여부는 별도 판단
-- [ ] 재주문 구현 시 원본 `OrderItem`을 재사용하지 말고 새로 생성
-  - `Order.items`에 `orphanRemoval = true`라 원본 주문에서 항목이 빠져 버림
+- [ ] 경로 ID 타입 오류 (`/menus/abc`)·`@Positive` 위반 (`/menus/0/availability`)·쿼리 누락 (`/menus/search`)·JSON 자료형 오류
+  (`"price":"abc"`)가 Spring 기본 형식 `{timestamp,status,error,path}` 로 나옴
+    - `CategoryOrderExceptionHandler`가 `assignableTypes`로 Category·Order·Reorder 컨트롤러에만 적용되어 있음.
+      Menu·Statistics·DeliveryBatches 컨트롤러까지 넓히거나 공통 핸들러로 합치기
+- [ ] `@Valid` 본문 검증 실패가 `{"code":"BAD_REQUEST","message":"공백일 수 없습니다"}` 로 나옴 (`ApiExceptionAdvice`의 `ApiError` 형식,
+  `fieldErrors` 없음)
+    - 기대: `{"code":"VALIDATION_ERROR","message":"입력값을 확인해 주세요.","fieldErrors":{"name":"..."}}`
+- [ ] 404 가 `{"code":"NOT_FOUND","message":"메뉴를 찾을 수 없습니다."}` 로 나옴 (`NotFoundException` → `ApiError`)
+    - 기대: code 는 `MENU_NOT_FOUND` / `CATEGORY_NOT_FOUND`, `fieldErrors: {}`. `NotFoundException` 대신
+      `BusinessException(ErrorCode.MENU_NOT_FOUND)` 사용
 
-## DB
+### OrderService (A11·A12)
 
-- [ ] 모든 PK에 `AUTO_INCREMENT` 추가 (엔티티는 `IDENTITY` 전략)
-- [ ] `orders.status`를 코드(`OrderStatus`)에 맞춰 `ENUM('PLACED','CANCELED') DEFAULT 'PLACED'`로 변경
-  - 원본 DDL은 `ENUM NOT NULL DEFAULT 'RECEIVED'`로 값 목록이 없고 기본값도 코드와 다름
-- [ ] FK 제약 추가 (원본 DDL에 없음). 정책은 `ERD.md` 참고
+- [ ] `OrderService.place()`·`findByCustomerEmail()`이 `ResponseStatusException`을 던져 본문이 Spring 기본 형식으로 나옴
+    - A11 메뉴 없음 404 → `BusinessException(MENU_NOT_FOUND)`
+    - A11 판매 중지 409 → `BusinessException(MENU_UNAVAILABLE)`
+    - A11 배송지 불일치 409 → `BusinessException(ADDRESS_MISMATCH)`
+    - A12 이메일 누락 400 → `BusinessException(VALIDATION_ERROR, {"email": ...})`
 
-```sql
-ALTER TABLE category   MODIFY category_id   BIGINT NOT NULL AUTO_INCREMENT;
-ALTER TABLE menu       MODIFY menu_id       BIGINT NOT NULL AUTO_INCREMENT;
-ALTER TABLE orders     MODIFY order_id      BIGINT NOT NULL AUTO_INCREMENT;
-ALTER TABLE order_item MODIFY order_item_id BIGINT NOT NULL AUTO_INCREMENT;
+### StatisticsController (A17·A18·A24)
 
-ALTER TABLE orders MODIFY status ENUM('PLACED','CANCELED') NOT NULL DEFAULT 'PLACED';
+- [ ] 미래 날짜 400 이 `{"code":"BAD_REQUEST","message":"미래 날짜는 조회할 수 없습니다"}` 로 나옴 (`org.apache.coyote.BadRequestException`
+  사용)
+    - 기대: `VALIDATION_ERROR` + `fieldErrors.date`
+- [ ] 날짜 형식 오류 (`date=abc`)가 Spring 기본 형식으로 나옴
 
-ALTER TABLE menu       ADD CONSTRAINT fk_menu_category      FOREIGN KEY (category_id)       REFERENCES category(category_id);
-ALTER TABLE order_item ADD CONSTRAINT fk_order_item_order   FOREIGN KEY (order_id)          REFERENCES orders(order_id) ON DELETE CASCADE;
-ALTER TABLE order_item ADD CONSTRAINT fk_order_item_menu    FOREIGN KEY (menu_id)           REFERENCES menu(menu_id)    ON DELETE SET NULL;
-ALTER TABLE orders     ADD CONSTRAINT fk_orders_reorder_src FOREIGN KEY (reorder_source_id) REFERENCES orders(order_id) ON DELETE SET NULL;
-```
+### DeliveryBatchesController (A14)
+
+- [ ] 날짜 누락·형식 오류가 Spring 기본 형식으로 나옴. 기대: `VALIDATION_ERROR` + `fieldErrors.shippingDate`
+
+## 3. 요청·응답 이름이 명세와 다른 것
+
+- [ ] **A11 주문 접수 요청 필드**: 명세 `email`·`address` ↔ 구현 `customerEmail`·`deliveryAddress` (`OrderCreateRequest`)
+    - 명세대로 보내면 400 이 남. `fieldErrors` 키도 `customerEmail`로 나옴 → 제공 web 화면 연결 시 반드시 맞춰야 함
+- [ ] **A12 쿼리**: 명세 `email` ↔ 구현 `customerEmail`
+- [ ] **A12 응답 필드**: 명세 `id·createdAt·shippingDate` ↔ 구현 `orderId·orderedAt·deliveryDate` (`OrderSummaryResponse`).
+  `status`도 `CANCELED`(엔티티 값)로 나감 → 명세는 `CANCELLED`
+- [ ] **A14 쿼리**: 명세 `shippingDate` ↔ 구현 `deliveryDate`
+- [ ] **A20 쿼리**: 명세 `keyword` ↔ 구현 `name`. 명세는 영문 대소문자 구분인데 구현은 `IgnoreCase`
+
+## 4. 명세 입력 검사 중 빠진 것
+
+- [ ] 메뉴: 가격 상한 1,000,000 / 설명 0~300자, `description` 필드 필수 (누락 시 400) / 이름·설명 앞뒤 공백 제거
+- [ ] 메뉴명 검색: 검색어 앞뒤 공백 제거 후 1~100자 (현재 `name=` 빈 문자열이면 200 + 전체 메뉴)
+- [ ] 주문: 항목 1~10개 / `menuId` 중복 금지 / 수량 1~20 / 주소 1 ~200자 / 우편번호 숫자 5자리 / 이메일 1~100자 + 명세 정규식
+- [ ] 주문 ID: `GET /orders/{orderId}` 에 `@Positive` 없음 → ID 0 이 400 이 아니라 404
+- [ ] 날짜 쿼리: 2000-01-01~2099-12-31 범위 검사 (A14·A17·A18·A24)
+- [ ] 카테고리 이름: 명세는 앞뒤 공백 제거 후 1~30자인데 `CategoryRequest`는 `@Size(max = 50)` (엔티티 길이도 50). 30 으로 맞추고 trim 후 검사
