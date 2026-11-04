@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
 public record OrderSummaryResponse(
-        Long orderId, OffsetDateTime orderedAt, LocalDate deliveryDate, Long totalAmount, OrderStatus status) {
+        Long orderId, OffsetDateTime orderedAt, LocalDate deliveryDate, Integer totalAmount, OrderStatus status) {
 
     private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
 

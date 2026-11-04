@@ -51,6 +51,7 @@ erDiagram
         VARCHAR(100) menu_name "NOT NULL, 주문 시점 스냅샷"
         INT unit_price "NOT NULL, 주문 시점 스냅샷"
         INT quantity "NOT NULL, 1 이상"
+        BIGINT line_amount "NOT NULL, unit_price × quantity (주문 시점 계산)"
     }
 ```
 

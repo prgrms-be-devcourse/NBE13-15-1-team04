@@ -38,17 +38,17 @@ class CategoryControllerTest {
     // ---------- A04 카테고리 수정 ----------
 
     @Test
-    @DisplayName("A04: 카테고리명이 공백뿐이면 400 VALIDATION_ERROR와 fieldErrors.categoryName을 반환한다")
+    @DisplayName("A04: 카테고리명이 공백뿐이면 400 VALIDATION_ERROR와 fieldErrors.name을 반환한다")
     void 카테고리명이_공백이면_400을_반환한다() throws Exception {
         mockMvc.perform(put("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryName": "   "}
+                                {"name": "   "}
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
-                .andExpect(jsonPath("$.fieldErrors.categoryName").exists());
+                .andExpect(jsonPath("$.fieldErrors.name").exists());
 
         verify(categoryService, never()).update(anyLong(), any(CategoryUpdateRequest.class));
     }
@@ -59,11 +59,11 @@ class CategoryControllerTest {
         mockMvc.perform(put("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryName": "  1234567890123456789012345678901  "}
+                                {"name": "  1234567890123456789012345678901  "}
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.fieldErrors.categoryName").exists());
+                .andExpect(jsonPath("$.fieldErrors.name").exists());
 
         verify(categoryService, never()).update(anyLong(), any(CategoryUpdateRequest.class));
     }
@@ -74,7 +74,7 @@ class CategoryControllerTest {
         mockMvc.perform(put("/api/v1/categories/0")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryName": "디카페인"}
+                                {"name": "디카페인"}
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
@@ -92,7 +92,7 @@ class CategoryControllerTest {
         mockMvc.perform(put("/api/v1/categories/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryName": "디카페인"}
+                                {"name": "디카페인"}
                                 """))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("CATEGORY_NOT_FOUND"))
@@ -109,7 +109,7 @@ class CategoryControllerTest {
         mockMvc.perform(put("/api/v1/categories/2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryName": "Single Origin"}
+                                {"name": "Single Origin"}
                                 """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("CATEGORY_NAME_DUPLICATED"))
@@ -122,7 +122,7 @@ class CategoryControllerTest {
     void 카테고리_수정_JSON_문법이_틀리면_400을_반환한다() throws Exception {
         mockMvc.perform(put("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"categoryName\": "))
+                        .content("{\"name\": "))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.fieldErrors").isEmpty());

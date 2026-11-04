@@ -10,7 +10,6 @@ import com.kdt.coffeprince.entity.Order;
 import com.kdt.coffeprince.entity.OrderItem;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
-import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.MenuRepository;
 import com.kdt.coffeprince.repository.OrderItemRepository;
 import com.kdt.coffeprince.repository.OrderRepository;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -44,6 +44,7 @@ public class OrderService {
 
     private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
     private static final LocalTime CUTOFF = LocalTime.of(14, 0, 0);
+
     // A22: 주문 메모 수정 (취소된 주문도 가능, memo만 변경)
     @Transactional
     public OrderResponse changeMemo(Long orderId, String memo) {
@@ -54,7 +55,6 @@ public class OrderService {
     }
 
     // ---------- A11 주문 접수 ----------
-    // A16: 주문 취소
     @Transactional
     public OrderResponse place(OrderCreateRequest request) {
         String customerEmail = request.customerEmail().trim();
@@ -118,6 +118,13 @@ public class OrderService {
 
     // ---------- A13 주문 상세 ----------
     public OrderResponse find(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
+        return OrderResponse.from(order);
+    }
+
+    // ---------- A16 주문 취소 ----------
+    @Transactional
     public OrderResponse cancel(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
@@ -131,7 +138,6 @@ public class OrderService {
             throw new BusinessException(ErrorCode.ORDER_NOT_CANCELLABLE);
         }
         order.cancel(now);
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
         return OrderResponse.from(order);
     }
 

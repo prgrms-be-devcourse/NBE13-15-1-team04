@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.service;
 
+import com.kdt.coffeprince.dto.CreateMenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;

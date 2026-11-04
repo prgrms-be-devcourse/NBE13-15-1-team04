@@ -39,7 +39,7 @@ public class OrderItem {
 
     public OrderItem(Menu menu, int quantity) {
         this.menu = menu;
-        this.menuName = menu.getMenuName();
+        this.menuName = menu.getName();
         this.unitPrice = menu.getPrice();
         this.quantity = quantity;
         this.lineAmount = (long) menu.getPrice() * quantity;

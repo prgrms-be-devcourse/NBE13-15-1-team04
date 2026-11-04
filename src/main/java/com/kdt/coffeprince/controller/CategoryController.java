@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @Validated
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
 
-    private static final String INVALID_ID = "카테고리 ID는 1 이상의 정수여야 함";
+    private static final String INVALID_ID = "카테고리 ID는 1 이상의 정수여야 합니다.";
 
     private final CategoryService categoryService;
 
@@ -27,17 +26,16 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
-    public List<CategoryResponse> list(){
+    @GetMapping                                   // A01
+    public List<CategoryResponse> list() {
         return categoryService.findAll();
     }
 
-    @GetMapping("/{categoryId}")
-    public CategoryResponse get(@PathVariable @Positive(message = INVALID_ID) Long categoryId){
+    @GetMapping("/{categoryId}")                  // A02
+    public CategoryResponse get(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
         return categoryService.find(categoryId);
     }
 
-    @PostMapping
     @GetMapping("/{categoryId}/menus")            // A15
     public List<MenuResponse> menus(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
         return categoryService.findMenus(categoryId);

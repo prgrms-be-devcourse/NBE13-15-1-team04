@@ -12,7 +12,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +21,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
-
-    private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +35,6 @@ public class Order {
     @Column(name = "customer_email", nullable = false, length = 100)
     private String customerEmail;
 
-    @Column(name = "customer_name", length = 50)      // nullable = false 제거
-    private String customerName;
-
     @Column(name = "customer_phone", length = 20)
     private String customerPhone;
 
@@ -53,12 +47,6 @@ public class Order {
 
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;
-
-    @Column(name = "post_code", nullable = false)
-    private String postcode;
-
-    @Column(nullable = false)
-    private LocalDate createdAt;                      // 서울 기준 접수일
 
     @Column
     private String memo;
@@ -84,7 +72,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("orderItemId ASC")                       // OrderItem의 PK 필드명에 맞추세요
+    @OrderBy("orderItemId ASC")
     private List<OrderItem> items = new ArrayList<>();
 
     // 주문 생성: 접수 시각과 배송일은 서비스가 계산해서 넘김
@@ -95,13 +83,14 @@ public class Order {
         o.deliveryAddress = deliveryAddress;
         o.postcode = postcode;
         o.orderedAt = orderedAt;
-        o.createdAt = orderedAt.atZone(SEOUL).toLocalDate();
         o.deliveryDate = deliveryDate;
         o.reorderSource = reorderSource;
         o.status = OrderStatus.PLACED;
         o.canceledAt = null;
         o.memo = "";
         return o;
+    }
+
     public boolean isPlaced() {
         return this.status == OrderStatus.PLACED;
     }
@@ -126,7 +115,9 @@ public class Order {
     public void addItem(OrderItem item) {
         items.add(item);
         item.setOrder(this);
-        this.totalAmount += item.getLineAmount();
+        this.totalAmount += item.getUnitPrice() * item.getQuantity();
+    }
+
     // A16: 상태와 취소 시각만 변경 (주문·항목·금액은 그대로)
     public void cancel(Instant now) {
         this.status = OrderStatus.CANCELED;
