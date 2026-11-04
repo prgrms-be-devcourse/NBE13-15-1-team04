@@ -1,4 +1,6 @@
 package com.kdt.coffeprince.dto;
 
-public record PutMenuRequest(Long categoryId, String menuName, Integer price, String description) {
+import com.kdt.coffeprince.entity.Menu;
+
+public record PutMenuRequest(Long categoryId, String name, Integer price, String description) {
 }

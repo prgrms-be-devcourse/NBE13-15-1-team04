@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * A04 카테고리 수정 요청: {"categoryName": "디카페인"}
+ * A04 카테고리 수정 요청: {"name": "디카페인"}
  */
 public record CategoryUpdateRequest(
         @NotBlank(message = "카테고리명을 입력해 주세요.")

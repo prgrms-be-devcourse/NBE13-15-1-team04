@@ -3,8 +3,13 @@ package com.kdt.coffeprince.service;
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
 import com.kdt.coffeprince.dto.CategoryUpdateRequest;
+import com.kdt.coffeprince.dto.MenuResponse;
+import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
+import com.kdt.coffeprince.repository.MenuRepository;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +21,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final MenuRepository menuRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, MenuRepository menuRepository) {
         this.categoryRepository = categoryRepository;
+        this.menuRepository = menuRepository;
     }
 
     public List<CategoryResponse> findAll() {
@@ -29,6 +36,16 @@ public class CategoryService {
 
     public CategoryResponse find(Long categoryId) {
         return CategoryResponse.from(getOrThrow(categoryId));
+    }
+
+    // A15: 카테고리별 메뉴 목록
+    public List<MenuResponse> findMenus(Long categoryId) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new NotFoundException("카테고리를 찾을 수 없습니다.");
+        }
+        return menuRepository.findAllByCategory_CategoryIdOrderByMenuIdAsc(categoryId).stream()
+                .map(MenuResponse::from)
+                .toList();
     }
 
     @Transactional

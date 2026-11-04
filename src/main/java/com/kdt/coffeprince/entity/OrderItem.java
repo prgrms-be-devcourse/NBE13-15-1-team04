@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id")
@@ -22,7 +21,7 @@ public class OrderItem {
 
     // 메뉴 삭제 시 null. 주문 내역은 아래 스냅샷으로 유지
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id", updatable = false)
+    @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
     // 주문 시점 스냅샷. 이후 Menu 가 바뀌어도 영향 없음

@@ -25,3 +25,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("DELETE FROM Category c WHERE c.categoryId = :categoryId")
     int deleteCategoryById(@Param("categoryId") Long categoryId);
 }
+

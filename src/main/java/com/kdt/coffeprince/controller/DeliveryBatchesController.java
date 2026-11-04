@@ -4,6 +4,8 @@ import com.kdt.coffeprince.dto.DeliveryBatchResponse;
 import com.kdt.coffeprince.service.OrderService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import com.kdt.coffeprince.service.DeliveryBatchesService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,13 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/delivery-batches")
+@RequiredArgsConstructor
 public class DeliveryBatchesController {
 
     private final OrderService orderService;
-
-    public DeliveryBatchesController(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @GetMapping                                            // A14
     public List<DeliveryBatchResponse> list(

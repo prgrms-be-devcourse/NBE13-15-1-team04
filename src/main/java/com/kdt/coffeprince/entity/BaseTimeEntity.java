@@ -22,3 +22,4 @@ public class BaseTimeEntity {
     @LastModifiedDate //수정할 때마다 자동 갱신
     private LocalDateTime modifiedDate;
 }
+

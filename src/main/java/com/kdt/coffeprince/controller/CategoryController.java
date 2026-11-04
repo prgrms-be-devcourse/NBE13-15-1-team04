@@ -3,6 +3,7 @@ package com.kdt.coffeprince.controller;
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
 import com.kdt.coffeprince.dto.CategoryUpdateRequest;
+import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.service.CategoryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -22,7 +23,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService){
+    public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
@@ -37,19 +38,26 @@ public class CategoryController {
     }
 
     @PostMapping
+    @GetMapping("/{categoryId}/menus")            // A15
+    public List<MenuResponse> menus(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
+        return categoryService.findMenus(categoryId);
+    }
+
+    @PostMapping                                  // A03
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryResponse create(@Valid @RequestBody CategoryRequest request){
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest request) {
         return categoryService.create(request);
     }
 
-    @PutMapping("/{categoryId}")
-    public CategoryResponse update(@PathVariable @Positive(message = INVALID_ID) Long categoryId, @Valid @RequestBody CategoryUpdateRequest request){
+    @PutMapping("/{categoryId}")                  // A04
+    public CategoryResponse update(@PathVariable @Positive(message = INVALID_ID) Long categoryId,
+                                   @Valid @RequestBody CategoryUpdateRequest request) {
         return categoryService.update(categoryId, request);
     }
 
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("/{categoryId}")               // A05
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @Positive(message = INVALID_ID) Long categoryId){
+    public void delete(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
         categoryService.delete(categoryId);
     }
 }
