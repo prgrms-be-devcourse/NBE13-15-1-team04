@@ -13,16 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import com.kdt.coffeprince.dto.MenuAvailabilityRequest;
+import com.kdt.coffeprince.exception.BusinessException;
+import com.kdt.coffeprince.exception.ErrorCode;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/menus")
@@ -64,9 +66,9 @@ public class MenuController {
             @RequestBody MenuAvailabilityRequest request
     ) {
         if (!(request.available() instanceof Boolean available)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "판매 여부는 true 또는 false로 입력해 주세요."
+            throw new BusinessException(
+                    ErrorCode.VALIDATION_ERROR,
+                    Map.of("available", "판매 여부는 true 또는 false로 입력해 주세요.")
             );
         }
         return ResponseEntity.ok(

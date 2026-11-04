@@ -4,6 +4,8 @@ import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.entity.Menu;
+import com.kdt.coffeprince.exception.BusinessException;
+import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
@@ -64,7 +66,7 @@ public class MenuService {
     @Transactional
     public MenuResponse changeAvailability(Long menuId, boolean available) {
         Menu menu = this.menuRepository.findById(menuId)
-                .orElseThrow(() -> new NotFoundException("메뉴를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_NOT_FOUND));
         menu.changeAvailability(available);
         return MenuResponse.from(menu);
     }

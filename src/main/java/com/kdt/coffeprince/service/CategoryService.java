@@ -4,7 +4,8 @@ import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
 import com.kdt.coffeprince.dto.CategoryUpdateRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
-import com.kdt.coffeprince.exception.NotFoundException;
+import com.kdt.coffeprince.exception.BusinessException;
+import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
@@ -41,7 +42,7 @@ public class CategoryService {
     // A15: 카테고리별 메뉴 목록
     public List<MenuResponse> findMenus(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
-            throw new NotFoundException("카테고리를 찾을 수 없습니다.");
+            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         return menuRepository.findAllByCategory_CategoryIdOrderByMenuIdAsc(categoryId).stream()
                 .map(MenuResponse::from)
@@ -64,7 +65,7 @@ public class CategoryService {
         String categoryName = request.categoryName().trim();
 
         if (categoryRepository.existsByCategoryNameAndCategoryIdNot(categoryName, categoryId)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "카테고리 중복");
+            throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED);
         }
         category.rename(categoryName);
         categoryRepository.flush();
@@ -75,7 +76,7 @@ public class CategoryService {
     public void delete(Long categoryId) {
         getOrThrow(categoryId);
         if (categoryRepository.countMenusByCategoryId(categoryId) > 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "사용중인 카테고리");
+            throw new BusinessException(ErrorCode.CATEGORY_IN_USE);
         }
         categoryRepository.deleteCategoryById(categoryId);
     }
@@ -86,6 +87,6 @@ public class CategoryService {
 
     private Category getOrThrow(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리 없음"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 }
