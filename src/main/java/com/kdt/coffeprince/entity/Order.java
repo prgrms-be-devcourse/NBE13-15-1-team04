@@ -106,6 +106,12 @@ public class Order {
         return this.status == OrderStatus.PLACED;
     }
 
+    public static List<Order> filterPlaced(List<Order> orders) {
+        return orders.stream()
+                .filter(Order::isPlaced)
+                .toList();
+    }
+
     // A22: 메모만 변경. 공백·줄바꿈을 그대로 저장(trim 안 함), ""는 비우기
     public void changeMemo(String memo) {
         this.memo = memo;

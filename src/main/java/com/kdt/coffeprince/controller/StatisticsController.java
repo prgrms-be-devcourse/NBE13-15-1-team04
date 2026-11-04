@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.controller;
 
+import com.kdt.coffeprince.dto.CustomerStatistics;
 import com.kdt.coffeprince.dto.MenuStatistics;
 import com.kdt.coffeprince.dto.OrderStatistics;
 import com.kdt.coffeprince.service.StatisticsService;
@@ -41,6 +42,16 @@ public class StatisticsController {
     ) throws BadRequestException {
         LocalDate targetDate = resolveTargetDate(date);
         return ResponseEntity.ok(statisticsService.getMenuStatisticsByDate(targetDate));
+    }
+
+    @GetMapping("/customers")
+    public ResponseEntity<List<CustomerStatistics>> getCustomerStatistics(
+            @RequestParam(value = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) throws BadRequestException {
+        LocalDate targetDate = resolveTargetDate(date);
+        return ResponseEntity.ok(statisticsService.getCustomerStatisticsByDate(targetDate));
     }
 
     private static LocalDate resolveTargetDate(LocalDate date) throws BadRequestException {

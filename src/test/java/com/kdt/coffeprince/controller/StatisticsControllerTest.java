@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.controller;
 
+import com.kdt.coffeprince.dto.CustomerStatistics;
 import com.kdt.coffeprince.dto.MenuStatistics;
 import com.kdt.coffeprince.dto.OrderStatistics;
 import com.kdt.coffeprince.service.StatisticsService;
@@ -28,6 +29,12 @@ class StatisticsControllerTest {
 
     private static final String URL = "/api/v1/statistics/orders";
     private static final String MENU_URL = "/api/v1/statistics/menus";
+    private static final String CUSTOMER_URL = "/api/v1/statistics/customers";
+    private static final String TEST_EMAIL_A = "a@test.com";
+    private static final String TEST_EMAIL_B = "b@test.com";
+    private static final int TEST_ITEM_PRICE_A = 500;
+    private static final int TEST_ITEM_PRICE_B = 23_900;
+    private static final int TEST_ITEM_PRICE_C = 9_800;
 
     @Autowired
     private MockMvc mockMvc;
@@ -193,12 +200,120 @@ class StatisticsControllerTest {
         verify(this.statisticsService).getMenuStatisticsByDate(captor.capture());
         assertEquals(today, captor.getValue());
     }
-    
+
     @Test
     void getMenuStatistics_with_future_date_returns_400_before_service() throws Exception {
         LocalDate tomorrow = DateUtils.today().plusDays(1);
 
         this.mockMvc.perform(get(MENU_URL)
+                        .param("date", tomorrow.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("미래 날짜는 조회할 수 없습니다"));
+
+        verifyNoInteractions(this.statisticsService);
+    }
+
+    @Test
+    void getCustomerStatistics_with_multiple_customers_returns_200() throws Exception {
+        LocalDate date = LocalDate.of(2026, 11, 1);
+        int totalAmountA = TEST_ITEM_PRICE_A * 3 + TEST_ITEM_PRICE_B * 9;
+        int totalAmountB = TEST_ITEM_PRICE_C * 3 + TEST_ITEM_PRICE_B * 2;
+        given(this.statisticsService.getCustomerStatisticsByDate(any(LocalDate.class)))
+                .willReturn(List.of(
+                        new CustomerStatistics(
+                                date,
+                                TEST_EMAIL_A,
+                                3,
+                                2,
+                                1,
+                                12,
+                                totalAmountA
+                        ),
+                        new CustomerStatistics(
+                                date,
+                                TEST_EMAIL_B,
+                                2,
+                                2,
+                                0,
+                                5,
+                                totalAmountB
+                        )
+                ));
+
+        this.mockMvc.perform(get(CUSTOMER_URL)
+                        .param("date", date.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpectAll(
+                        jsonPath("$[0].date").value(date.toString()),
+                        jsonPath("$[0].email").value(TEST_EMAIL_A),
+                        jsonPath("$[0].orderCount").value(3),
+                        jsonPath("$[0].placedOrderCount").value(2),
+                        jsonPath("$[0].cancelledOrderCount").value(1),
+                        jsonPath("$[0].totalQuantity").value(12),
+                        jsonPath("$[0].totalAmount").value(totalAmountA)
+                )
+                .andExpectAll(
+                        jsonPath("$[1].date").value(date.toString()),
+                        jsonPath("$[1].email").value(TEST_EMAIL_B),
+                        jsonPath("$[1].orderCount").value(2),
+                        jsonPath("$[1].placedOrderCount").value(2),
+                        jsonPath("$[1].cancelledOrderCount").value(0),
+                        jsonPath("$[1].totalQuantity").value(5),
+                        jsonPath("$[1].totalAmount").value(totalAmountB)
+                );
+
+        ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
+        verify(this.statisticsService).getCustomerStatisticsByDate(captor.capture());
+        assertEquals(date, captor.getValue());
+    }
+
+    @Test
+    void getCustomerStatistics_with_no_orders_returns_200_with_empty_list() throws Exception {
+        LocalDate date = LocalDate.of(2026, 11, 1);
+        given(this.statisticsService.getCustomerStatisticsByDate(any(LocalDate.class)))
+                .willReturn(List.of());
+
+        this.mockMvc.perform(get(CUSTOMER_URL)
+                        .param("date", date.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+
+        ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
+        verify(this.statisticsService).getCustomerStatisticsByDate(captor.capture());
+        assertEquals(date, captor.getValue());
+    }
+
+    @Test
+    void getCustomerStatistics_without_date_uses_today() throws Exception {
+        LocalDate today = DateUtils.today();
+        given(this.statisticsService.getCustomerStatisticsByDate(any(LocalDate.class)))
+                .willReturn(List.of());
+
+        this.mockMvc.perform(get(CUSTOMER_URL)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
+        verify(this.statisticsService).getCustomerStatisticsByDate(captor.capture());
+        assertEquals(today, captor.getValue());
+    }
+
+    @Test
+    void getCustomerStatistics_with_future_date_returns_400_before_service() throws Exception {
+        LocalDate tomorrow = DateUtils.today().plusDays(1);
+
+        this.mockMvc.perform(get(CUSTOMER_URL)
                         .param("date", tomorrow.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
