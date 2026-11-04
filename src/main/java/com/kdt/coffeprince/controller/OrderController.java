@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -39,8 +41,8 @@ public class OrderController {
     }
 
     @GetMapping                                            // A12
-    public List<OrderSummaryResponse> list(@RequestParam(required = false) String customerEmail) {
-        return orderService.findByCustomerEmail(customerEmail);
+    public List<OrderSummaryResponse> list(@RequestParam(required = false) String email) {
+        return orderService.findByCustomerEmail(email);
     }
 
     @PutMapping("/{orderId}/memo")                 // A22

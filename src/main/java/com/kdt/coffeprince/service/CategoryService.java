@@ -7,6 +7,7 @@ import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.entity.Category;
+import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,7 @@ public class CategoryService {
     // A15: 카테고리별 메뉴 목록
     public List<MenuResponse> findMenus(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
-            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
+            throw new NotFoundException("카테고리를 찾을 수 없습니다.");
         }
         return menuRepository.findAllByCategory_CategoryIdOrderByMenuIdAsc(categoryId).stream()
                 .map(MenuResponse::from)

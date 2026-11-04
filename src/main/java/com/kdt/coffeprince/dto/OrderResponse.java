@@ -15,7 +15,7 @@ public record OrderResponse(
         String email,
         String address,
         String postcode,
-        String createdAt,
+        String orderedAt,
         String shippingDate,
         Integer totalAmount,
         List<OrderItemResponse> items,
@@ -46,12 +46,12 @@ public record OrderResponse(
     }
 
     // Instant -> 서울 시각 문자열. 값이 없으면(취소 전 cancelledAt) null
-    private static String toSeoulTime(Instant time) {
+    static String toSeoulTime(Instant time) {
         return time == null ? null : time.atZone(SEOUL).format(SEOUL_TIME);
     }
 
     // DB·엔티티는 CANCELED, 명세서 응답은 CANCELLED
-    private static String toResponseStatus(OrderStatus status) {
+    static String toResponseStatus(OrderStatus status) {
         return status == OrderStatus.CANCELED ? "CANCELLED" : status.name();
     }
 }

@@ -65,5 +65,4 @@ public class Menu {
     public void changeAvailability(boolean available) {
         this.isAvailable = available;
     }
-
 }

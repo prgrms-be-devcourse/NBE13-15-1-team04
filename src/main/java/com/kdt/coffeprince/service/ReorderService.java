@@ -60,16 +60,16 @@ public class ReorderService {
 
         // 3. 접수 시각 = 재주문 처리 시각, 배송일은 이 시각 기준으로 다시 계산
         Instant orderedAt = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
-        LocalDate deliveryDate = calculateDeliveryDate(orderedAt);
+        LocalDate shippingDate = calculateShippingDate(orderedAt);
 
         // 4. 같은 이메일·배송일의 PLACED 주문과 주소·우편번호가 다르면 409
         String address = source.getDeliveryAddress().trim();
         String postcode = source.getPostcode().trim();
-        validateSameDeliveryAddress(source.getCustomerEmail(), deliveryDate, address, postcode);
+        validateSameAddress(source.getCustomerEmail(), shippingDate, address, postcode);
 
         // 5. 새 주문 + 새 항목 (원본 항목은 재사용하지 않는다 → 원본 주문은 그대로)
         Order reorder = Order.place(source.getCustomerEmail(), address, postcode,
-                orderedAt, deliveryDate, source);
+                orderedAt, shippingDate, source);
         for (OrderItem item : sourceItems) {
             reorder.addItem(new OrderItem(menus.get(item.getMenuId()), item.getQuantity()));
         }
@@ -86,16 +86,16 @@ public class ReorderService {
     }
 
     // 서울 14:00:00 전이면 당일, 정각부터는 다음 날 (연말이면 다음 해로 넘어감)
-    private LocalDate calculateDeliveryDate(Instant orderedAt) {
+    private LocalDate calculateShippingDate(Instant orderedAt) {
         ZonedDateTime seoul = orderedAt.atZone(DateUtils.ZONE);
         return seoul.toLocalTime().isBefore(CUTOFF)
                 ? seoul.toLocalDate()
                 : seoul.toLocalDate().plusDays(1);
     }
 
-    private void validateSameDeliveryAddress(String email, LocalDate deliveryDate, String address, String postcode) {
+    private void validateSameAddress(String email, LocalDate shippingDate, String address, String postcode) {
         boolean mismatch = orderRepository
-                .findByCustomerEmailAndDeliveryDateAndStatus(email, deliveryDate, OrderStatus.PLACED)
+                .findByCustomerEmailAndDeliveryDateAndStatus(email, shippingDate, OrderStatus.PLACED)
                 .stream()
                 .anyMatch(o -> !o.getDeliveryAddress().trim().equals(address)
                         || !o.getPostcode().trim().equals(postcode));
