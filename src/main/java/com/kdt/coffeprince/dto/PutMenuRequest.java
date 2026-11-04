@@ -1,6 +1,14 @@
 package com.kdt.coffeprince.dto;
 
-import com.kdt.coffeprince.entity.Menu;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
-public record PutMenuRequest(Long categoryId, String name, Integer price, String description) {
+public record PutMenuRequest(
+        @NotNull @Positive Long categoryId,
+        @NotBlank @Size(max = 100) String name,
+        @NotNull @Positive Integer price,
+        String description
+) {
 }

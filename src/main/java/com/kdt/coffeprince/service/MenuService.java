@@ -35,10 +35,15 @@ public class MenuService {
 
     @Transactional
     public MenuResponse updateMenu(Long menuId, PutMenuRequest body) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow();
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() ->
+                        new NotFoundException("메뉴를 찾을 수 없습니다.")
+                );
 
         Category category = categoryRepository.findById(body.categoryId())
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new NotFoundException("카테고리를 찾을 수 없습니다.")
+                );
 
         menu.update(
                 category,
@@ -69,7 +74,9 @@ public class MenuService {
     @Transactional
     public MenuResponse createMenu(CreateMenuRequest body) {
         Category category = categoryRepository.findById(body.categoryId())
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new NotFoundException("카테고리를 찾을 수 없습니다.")
+                );
 
         Menu menu = new Menu(
                 category,
@@ -86,7 +93,9 @@ public class MenuService {
     @Transactional
     public void deleteMenu(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new NotFoundException("메뉴를 찾을 수 없습니다.")
+                );
 
         menuRepository.delete(menu);
     }
