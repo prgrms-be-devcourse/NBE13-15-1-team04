@@ -2,6 +2,10 @@ package com.kdt.coffeprince.exception;
 
 import com.kdt.coffeprince.controller.CategoryController;
 import com.kdt.coffeprince.controller.OrderController;
+import com.kdt.coffeprince.controller.ReorderController;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +13,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterErrors;
 import org.springframework.validation.method.ParameterValidationResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -17,11 +22,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// Category·Order Controller에서 Spring이 던지는 입력 오류만 명세 형식으로 응답한다 (다른 Controller는 영향 없음)
+// Category·Order·Reorder Controller에서 Spring이 던지는 입력 오류만 명세 형식으로 응답한다 (다른 Controller는 영향 없음)
 // 직접 던지는 BusinessException은 BusinessExceptionHandler가 처리한다
 // 팀 공통 틀이 정해지면 ApiExceptionAdvice와 합칠 예정
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(assignableTypes = {CategoryController.class, OrderController.class})
+@RestControllerAdvice(assignableTypes = {CategoryController.class, OrderController.class, ReorderController.class})
 public class CategoryOrderExceptionHandler {
 
     // 400: @Positive(경로 ID) 또는 @Valid(본문) 검사 실패. 예: /categories/0, 이름 31자
@@ -42,6 +47,31 @@ public class CategoryOrderExceptionHandler {
                         : result.getResolvableErrors().getFirst().getDefaultMessage();
                 fieldErrors.putIfAbsent(name, message);
             }
+        }
+        return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
+    }
+
+    // 400: Controller에 @Validated가 붙어 있으면 @Positive(경로 ID) 검사 실패가 이 예외로 온다. 예: /categories/0
+    //      propertyPath "update.categoryId" → 마지막 이름 "categoryId"를 필드명으로 쓴다
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException err) {
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        for (ConstraintViolation<?> violation : err.getConstraintViolations()) {
+            String name = "";
+            for (Path.Node node : violation.getPropertyPath()) {
+                name = node.getName();
+            }
+            fieldErrors.putIfAbsent(name, violation.getMessage());
+        }
+        return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
+    }
+
+    // 400: Controller에 @Validated가 붙어 있으면 @Valid(본문) 검사 실패가 이 예외로 온다. 예: 카테고리명 31자
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleBodyValidation(MethodArgumentNotValidException err) {
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        for (FieldError error : err.getBindingResult().getFieldErrors()) {
+            fieldErrors.putIfAbsent(error.getField(), error.getDefaultMessage());
         }
         return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
     }
