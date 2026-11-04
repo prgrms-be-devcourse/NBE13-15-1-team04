@@ -25,8 +25,8 @@ public class Menu {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String menuName;
+    @Column(nullable = false, length = 100)
+    private String name;
 
     @Column
     private String description;
@@ -45,9 +45,9 @@ public class Menu {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public void update(Category category, String menuName, int price, String description) {
+    public void update(Category category, String name, int price, String description) {
         this.category = category;
-        this.menuName = menuName;
+        this.name = name;
         this.price = price;
         this.description = description;
     }
@@ -65,3 +65,5 @@ public class Menu {
     public void changeAvailability(boolean available) {
         this.isAvailable = available;
     }
+
+}

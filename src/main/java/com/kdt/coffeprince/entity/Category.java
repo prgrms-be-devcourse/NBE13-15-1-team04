@@ -24,8 +24,8 @@ public class Category {
     @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(name = "name", nullable = false, length = 50)
-    private String categoryName;
+    @Column(nullable = false, length = 50)
+    private String name;
 
     @Column
     private String description;
@@ -42,12 +42,12 @@ public class Category {
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Menu> menus = new ArrayList<>();
 
-    public Category(String categoryName) {
-        this.categoryName = categoryName;
+    public Category(String name) {
+        this.name = name;
     }
 
-    public void rename(String categoryName) {
-        this.categoryName = categoryName;
+    public void rename(String name) {
+        this.name = name;
     }
 
 }

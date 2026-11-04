@@ -9,8 +9,6 @@ import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,23 +49,23 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse create(CategoryRequest request) {
-        String categoryName = request.categoryName().trim();
-        if (categoryRepository.existsByCategoryName(categoryName)) {
+        String name = request.name().trim();
+        if (categoryRepository.existsByName(name)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "카테고리 중복");
         }
-        Category saved = categoryRepository.saveAndFlush(new Category(categoryName));
+        Category saved = categoryRepository.saveAndFlush(new Category(name));
         return CategoryResponse.from(saved);
     }
 
     @Transactional
     public CategoryResponse update(Long categoryId, CategoryUpdateRequest request) {
         Category category = getOrThrow(categoryId);
-        String categoryName = request.categoryName().trim();
+        String name = request.name().trim();
 
-        if (categoryRepository.existsByCategoryNameAndCategoryIdNot(categoryName, categoryId)) {
+        if (categoryRepository.countSameNameExactly(name, categoryId) > 0) {
             throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED);
         }
-        category.rename(categoryName);
+        category.rename(name);
         categoryRepository.flush();
         return CategoryResponse.from(category);
     }

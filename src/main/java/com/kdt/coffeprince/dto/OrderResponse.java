@@ -3,8 +3,6 @@ package com.kdt.coffeprince.dto;
 import com.kdt.coffeprince.constant.OrderStatus;
 import com.kdt.coffeprince.entity.Order;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,16 +11,16 @@ import java.util.List;
 // 전체 Order 응답 (A11·A13·A16·A22·A23 공통)
 // 명세서 "요청·응답 JSON > 주문 접수·상세·취소·메모·재주문" 기준
 public record OrderResponse(
-        Long orderId,
-        String customerEmail,
-        String deliveryAddress,
+        Long id,
+        String email,
+        String address,
         String postcode,
-        OffsetDateTime orderedAt,
-        LocalDate deliveryDate,
-        Long totalAmount,
+        String createdAt,
+        String shippingDate,
+        Integer totalAmount,
         List<OrderItemResponse> items,
-        OrderStatus status,
-        OffsetDateTime canceledAt,
+        String status,
+        String cancelledAt,
         String memo
 ) {
     private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
@@ -35,8 +33,6 @@ public record OrderResponse(
                 order.getCustomerEmail(),
                 order.getDeliveryAddress(),
                 order.getPostcode(),
-                order.getOrderedAt().atZone(SEOUL).toOffsetDateTime(),
-                order.getDeliveryDate(),
                 toSeoulTime(order.getOrderedAt()),
                 order.getDeliveryDate().toString(),
                 order.getTotalAmount(),
@@ -58,4 +54,4 @@ public record OrderResponse(
     private static String toResponseStatus(OrderStatus status) {
         return status == OrderStatus.CANCELED ? "CANCELLED" : status.name();
     }
-}
+}
