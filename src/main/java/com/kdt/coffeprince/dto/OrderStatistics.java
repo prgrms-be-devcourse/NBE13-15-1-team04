@@ -15,9 +15,7 @@ public record OrderStatistics(
         int totalAmount
 ) {
     public static OrderStatistics from(LocalDate date, List<Order> orders) {
-        List<Order> placed = orders.stream()
-                .filter(Order::isPlaced)
-                .toList();
+        List<Order> placed = Order.filterPlaced(orders);
 
         int totalQuantity = 0;
         int totalAmount = 0;
