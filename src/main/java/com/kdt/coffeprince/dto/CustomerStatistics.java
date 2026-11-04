@@ -18,7 +18,6 @@ public record CustomerStatistics
                 int totalQuantity,
                 int totalAmount
         ) {
-
     public static List<CustomerStatistics> listFrom(LocalDate date, List<Order> orders) {
         return orders.stream()
                 .collect(Collectors.groupingBy(
