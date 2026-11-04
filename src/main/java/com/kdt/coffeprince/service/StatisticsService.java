@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.service;
 
+import com.kdt.coffeprince.dto.CustomerStatistics;
 import com.kdt.coffeprince.dto.MenuStatistics;
 import com.kdt.coffeprince.dto.OrderStatistics;
 import com.kdt.coffeprince.entity.Order;
@@ -32,6 +33,12 @@ public class StatisticsService {
         List<Order> orders = this.findOrdersOn(date);
 
         return MenuStatistics.listFrom(orders);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CustomerStatistics> getCustomerStatisticsByDate(LocalDate date) {
+        List<Order> orders = this.findOrdersOn(date);
+        return CustomerStatistics.listFrom(date, orders);
     }
 
     private List<Order> findOrdersOn(LocalDate date) {
