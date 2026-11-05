@@ -306,6 +306,7 @@ PUT {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}/availability
 Content-Type: application/json
 
 {
+
   "available": false
 }
 
