@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Collate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,8 +31,6 @@ public class Menu {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    // A20 메뉴명 검색은 영문 대소문자를 구분. 테이블 기본(utf8mb4_0900_ai_ci)은 대소문자를 무시하므로 이 컬럼만 _cs 지정
-    @Collate("utf8mb4_0900_as_cs")
     @Column(nullable = false, length = MAX_NAME_LENGTH)
     private String name;
 

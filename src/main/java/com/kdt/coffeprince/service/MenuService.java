@@ -102,7 +102,7 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public List<MenuResponse> searchMenus(String name) {
-        return menuRepository.findByNameContaining(name)
+        return menuRepository.searchByNameExactCase(name)
                 .stream()
                 .map(MenuResponse::from)
                 .toList();
