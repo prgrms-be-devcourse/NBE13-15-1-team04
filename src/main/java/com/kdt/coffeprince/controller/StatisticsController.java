@@ -5,6 +5,8 @@ import com.kdt.coffeprince.dto.MenuStatistics;
 import com.kdt.coffeprince.dto.OrderStatistics;
 import com.kdt.coffeprince.service.StatisticsService;
 import com.kdt.coffeprince.util.DateUtils;
+import com.kdt.coffeprince.validation.ErrorCodePayload;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,6 +50,8 @@ public class StatisticsController {
     public ResponseEntity<List<CustomerStatistics>> getCustomerStatistics(
             @RequestParam(value = "date", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @PastOrPresent(message = "조회 날짜는 오늘 이전이어야 합니다.",
+                    payload = ErrorCodePayload.OrderNotFound.class)
             LocalDate date
     ) throws BadRequestException {
         LocalDate targetDate = resolveTargetDate(date);
@@ -55,10 +59,6 @@ public class StatisticsController {
     }
 
     private static LocalDate resolveTargetDate(LocalDate date) throws BadRequestException {
-        LocalDate targetDate = DateUtils.getOrDefault(date);
-        if (DateUtils.isFuture(targetDate)) {
-            throw new BadRequestException("미래 날짜는 조회할 수 없습니다");
-        }
-        return targetDate;
+        return DateUtils.getOrDefault(date);
     }
 }
