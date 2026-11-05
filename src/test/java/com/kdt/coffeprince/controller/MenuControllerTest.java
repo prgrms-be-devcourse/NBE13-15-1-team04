@@ -3,11 +3,13 @@ package com.kdt.coffeprince.controller;
 import com.kdt.coffeprince.dto.CreateMenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.dto.PutMenuRequest;
+import com.kdt.coffeprince.exception.BusinessException;
+import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.service.MenuService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,17 +17,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import com.kdt.coffeprince.exception.NotFoundException;
-import com.kdt.coffeprince.exception.ApiExceptionAdvice;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Import(ApiExceptionAdvice.class)
 @WebMvcTest(MenuController.class)
 class MenuControllerTest {
 
@@ -126,7 +125,7 @@ class MenuControllerTest {
                 .thenReturn(List.of(response));
 
         mockMvc.perform(get("/api/v1/menus/search")
-                        .param("name", "아메리카노"))
+                        .param("keyword", "아메리카노"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].name").value("아메리카노"))
@@ -137,14 +136,15 @@ class MenuControllerTest {
 
     @Test
     void deleteMenu_notFound() throws Exception {
-        doThrow(new NotFoundException("메뉴를 찾을 수 없습니다."))
+        doThrow(new BusinessException(ErrorCode.MENU_NOT_FOUND))
                 .when(menuService).deleteMenu(999L);
 
         mockMvc.perform(delete("/api/v1/menus/999"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value("NOT_FOUND"))
+                .andExpect(jsonPath("$.code").value("MENU_NOT_FOUND"))
                 .andExpect(jsonPath("$.message")
-                        .value("메뉴를 찾을 수 없습니다."));
+                        .value("메뉴를 찾을 수 없습니다."))
+                .andExpect(jsonPath("$.fieldErrors").isEmpty());
 
         verify(menuService).deleteMenu(999L);
     }
@@ -154,19 +154,66 @@ class MenuControllerTest {
         mockMvc.perform(post("/api/v1/menus")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "categoryId": 1,
-                              "name": "",
-                              "price": 5000,
-                              "description": "테스트 메뉴"
-                            }
-                            """))
+                                {
+                                  "categoryId": 1,
+                                  "name": "",
+                                  "price": 5000,
+                                  "description": "테스트 메뉴"
+                                }
+                                """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("BAD_REQUEST"));
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
 
         verify(menuService, never())
                 .createMenu(any(CreateMenuRequest.class));
     }
 
-}
+    // A21 판매 여부 변경 — 예외 응답이 명세 형식(code·message·fieldErrors)인지 확인
+    @Test
+    @DisplayName("A21: available이 문자열 \"false\"면 400 VALIDATION_ERROR와 fieldErrors.available을 반환한다")
+    void 판매여부가_문자열이면_400을_반환한다() throws Exception {
+        mockMvc.perform(put("/api/v1/menus/1/availability")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"available": "false"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
+                .andExpect(jsonPath("$.fieldErrors.available").value("true 또는 false로 입력해 주세요."));
 
+        verify(menuService, never()).changeAvailability(anyLong(), anyBoolean());
+    }
+
+    @Test
+    @DisplayName("A21: available이 null이면 400 VALIDATION_ERROR와 fieldErrors.available을 반환한다")
+    void 판매여부가_null이면_400을_반환한다() throws Exception {
+        mockMvc.perform(put("/api/v1/menus/1/availability")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"available": null}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.fieldErrors.available").exists());
+
+        verify(menuService, never()).changeAvailability(anyLong(), anyBoolean());
+    }
+
+    @Test
+    @DisplayName("A21: 없는 메뉴의 판매 여부를 바꾸면 404 MENU_NOT_FOUND를 반환한다")
+    void 없는_메뉴의_판매여부를_바꾸면_404를_반환한다() throws Exception {
+        when(menuService.changeAvailability(999L, false))
+                .thenThrow(new BusinessException(ErrorCode.MENU_NOT_FOUND));
+
+        mockMvc.perform(put("/api/v1/menus/999/availability")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"available": false}
+                                """))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("MENU_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("메뉴를 찾을 수 없습니다."))
+                .andExpect(jsonPath("$.fieldErrors").isEmpty());
+    }
+}
