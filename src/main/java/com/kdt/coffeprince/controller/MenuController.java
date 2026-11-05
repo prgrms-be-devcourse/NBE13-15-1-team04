@@ -1,33 +1,19 @@
 package com.kdt.coffeprince.controller;
 
-import com.kdt.coffeprince.dto.MenuResponse;
-import com.kdt.coffeprince.dto.PutMenuRequest;
+import com.kdt.coffeprince.dto.*;
 import com.kdt.coffeprince.service.MenuService;
-import com.kdt.coffeprince.dto.CreateMenuRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-import com.kdt.coffeprince.dto.MenuAvailabilityRequest;
-import com.kdt.coffeprince.exception.BusinessException;
-import com.kdt.coffeprince.exception.ErrorCode;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Tag(
         name = "메뉴 API",
@@ -39,11 +25,12 @@ import java.util.Map;
 public class MenuController {
     private final MenuService menuService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{menuId}")
     public ResponseEntity<MenuResponse> getMenu(
-            @PathVariable("id") Long id
+            @Positive
+            @PathVariable("menuId") Long menuId
     ) {
-        return ResponseEntity.ok(menuService.one(id));
+        return ResponseEntity.ok(menuService.one(menuId));
     }
 
     @GetMapping
@@ -59,8 +46,7 @@ public class MenuController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping("/available")
-    public ResponseEntity<List<MenuResponse>> getAvailableMenus(){
-
+    public ResponseEntity<List<MenuResponse>> getAvailableMenus() {
         return ResponseEntity.ok(menuService.available());
     }
 
@@ -73,29 +59,24 @@ public class MenuController {
             @ApiResponse(responseCode = "400", description = "요청 데이터 검증 실패"),
             @ApiResponse(responseCode = "404", description = "메뉴 또는 카테고리를 찾을 수 없음")
     })
-    @PutMapping("/{id}")
+    @PutMapping("/{menuId}")
     public ResponseEntity<MenuResponse> updateMenu(
-            @PathVariable("id") Long id ,
+
+            @Positive @PathVariable("menuId") Long menuId,
             @Valid @RequestBody PutMenuRequest body
-    ){
-        return ResponseEntity.ok(menuService.updateMenu(id,body));
+    ) {
+        return ResponseEntity.ok(menuService.updateMenu(menuId, body));
     }
 
     @PutMapping("/{menuId}/availability")         // A21
     public ResponseEntity<MenuResponse> changeAvailability(
             @PathVariable
-            @Positive(message = "메뉴 ID는 1 이상의 정수여야 합니다.")
+            @Positive
             Long menuId,
-            @RequestBody MenuAvailabilityRequest request
+            @Valid @RequestBody MenuAvailabilityRequest request
     ) {
-        if (!(request.available() instanceof Boolean available)) {
-            throw new BusinessException(
-                    ErrorCode.VALIDATION_ERROR,
-                    Map.of("available", "판매 여부는 true 또는 false로 입력해 주세요.")
-            );
-        }
         return ResponseEntity.ok(
-                menuService.changeAvailability(menuId,available)
+                menuService.changeAvailability(menuId, request.available())
         );
     }
 
@@ -127,26 +108,24 @@ public class MenuController {
             @ApiResponse(responseCode = "204", description = "메뉴 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "메뉴를 찾을 수 없음")
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(
-            @PathVariable("id") Long id
+            @Positive @PathVariable("menuId") Long menuId
     ) {
-        menuService.deleteMenu(id);
+        menuService.deleteMenu(menuId);
 
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
             summary = "메뉴 검색",
-            description = "메뉴명에 검색어가 포함된 메뉴를 조회합니다. 영문 대소문자를 구분하지 않습니다."
+            description = "메뉴명에 검색어가 포함된 메뉴를 조회합니다. 영문 대소문자를 구분합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "검색 성공")
     })
     @GetMapping("/search")
-    public ResponseEntity<List<MenuResponse>> searchMenus(
-            @RequestParam("name") String name
-    ) {
-        return ResponseEntity.ok(menuService.searchMenus(name));
+    public ResponseEntity<List<MenuResponse>> searchMenus(@Valid @ModelAttribute MenuSearchRequest request) {
+        return ResponseEntity.ok(menuService.searchMenus(request.keyword()));
     }
 }
