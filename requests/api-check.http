@@ -16,8 +16,7 @@ POST {{baseUrl}}/categories
 Content-Type: application/json
 
 {
-  "name": "new category",
-  "description": "new category"
+  "name": "new category"
 }
 
 ### A03 카테고리 등록 실패 (중복 카테고리)
@@ -25,8 +24,7 @@ POST {{baseUrl}}/categories
 Content-Type: application/json
 
 {
-  "name": "new category",
-  "description": "new category"
+  "name": "new category"
 }
 
 ### A03 카테고리 등록 실패 (name 필드 공백)
@@ -34,8 +32,7 @@ POST {{baseUrl}}/categories
 Content-Type: application/json
 
 {
-  "name": "asd",
-  "description": ""
+  "name": "   "
 }
 
 ### A04 카테고리 수정 성공
@@ -44,8 +41,7 @@ PUT {{baseUrl}}/categories/{{updateCategoryId}}
 Content-Type: application/json
 
 {
-  "name": "updated name",
-  "description": "update test"
+  "name": "updated name"
 }
 
 ### A04 카테고리 수정 실패 (카테고리 이름 중복)
@@ -53,8 +49,7 @@ PUT {{baseUrl}}/categories/{{updateCategoryId}}
 Content-Type: application/json
 
 {
-  "name": "Single Origin",
-  "description": "duplicated category name"
+  "name": "Single Origin"
 }
 
 ### A04 카테고리 수정 실패 (카테고리 이름 공백)
@@ -62,8 +57,7 @@ PUT {{baseUrl}}/categories/{{updateCategoryId}}
 Content-Type: application/json
 
 {
-  "name": "",
-  "description": "duplicated category name"
+  "name": ""
 }
 
 ### A04 카테고리 수정 실패 (카테고리 이름 타입)
@@ -72,8 +66,7 @@ PUT {{baseUrl}}/categories/{{updateCategoryIdWithInvalidType}}
 Content-Type: application/json
 
 {
-  "name": "asdasd",
-  "description": "updateCategoryIdWithInvalidType"
+  "name": "asdasd"
 }
 
 ### A04 카테고리 수정 실패 (존재하지 않는 카테고리 ID)
@@ -82,8 +75,7 @@ PUT {{baseUrl}}/categories/{{updateCategoryIdNotFound}}
 Content-Type: application/json
 
 {
-  "name": "asdasd",
-  "description": "updateCategoryIdNotFound"
+  "name": "asdasd"
 }
 
 ### A05 카테고리 삭제 성공 (카테고리 등록 테스트 후 진행)

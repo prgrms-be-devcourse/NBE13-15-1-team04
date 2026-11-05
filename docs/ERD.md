@@ -11,8 +11,7 @@ erDiagram
 
     category {
         BIGINT category_id PK "AUTO_INCREMENT"
-        VARCHAR(50) name "NOT NULL"
-        VARCHAR(255) description
+        VARCHAR(30) name "NOT NULL"
         DATETIME created_at "NOT NULL"
         DATETIME updated_at "NOT NULL"
     }

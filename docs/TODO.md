@@ -72,3 +72,14 @@
 - [ ] 주문 ID: `GET /orders/{orderId}` 에 `@Positive` 없음 → ID 0 이 400 이 아니라 404
 - [ ] 날짜 쿼리: 2000-01-01~2099-12-31 범위 검사 (A14·A17·A18·A24)
 - [ ] 카테고리 이름: 명세는 앞뒤 공백 제거 후 1~30자인데 `CategoryRequest`는 `@Size(max = 50)` (엔티티 길이도 50). 30 으로 맞추고 trim 후 검사
+
+## 5. 보류 (코드 일관성 정리 후 진행)
+
+- [ ] **문자열 입력 trim 을 애노테이션으로 통일** — `CategoryRequest`·`CategoryUpdateRequest`·`CreateMenuRequest`·`PutMenuRequest`의
+  컴팩트 생성자와 `CategoryService`·`OrderService`·`ReorderService`에 같은 `trim()` 로직이 흩어져 있음
+    - 방안: `@Trimmed` 커스텀 애노테이션 (`@JacksonAnnotationsInside` + `@JsonDeserialize(using = TrimmedStringDeserializer.class)`)
+      을 만들어 DTO 필드에 붙이고 생성자·서비스의 trim 제거. JSON 본문에만 적용되므로 쿼리 파라미터(`MenuSearchRequest`)는 별도
+    - 검증 흐름은 그대로: trim 후 `@NotBlank`·`@Size` → `MethodArgumentNotValidException` → `ValidationExceptionHandler`
+    - `{"name": 1}` 같은 자료형 오류는 현재 Jackson 이 `"1"` 로 변환해 통과시킴. 막으려면 역직렬화기에서 `VALUE_STRING` 토큰 검사
+      추가 (전역은 `coercionConfigFor(LogicalType.Textual)` 설정). 널널하게 보기로 하여 당장은 적용 안 함
+    - Order·Reorder 서비스는 담당자가 달라 기록만 함
