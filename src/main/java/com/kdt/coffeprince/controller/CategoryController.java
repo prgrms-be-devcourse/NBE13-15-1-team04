@@ -7,8 +7,8 @@ import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.service.CategoryService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}/menus")            // A15
-    public List<MenuResponse> menus(@PathVariable @Positive(message = INVALID_ID) Long categoryId) {
+    public List<MenuResponse> menus(@PathVariable @Positive Long categoryId) {
         return categoryService.findMenus(categoryId);
     }
 
