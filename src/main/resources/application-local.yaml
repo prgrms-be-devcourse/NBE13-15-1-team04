@@ -20,3 +20,17 @@ spring:
       mode: always
       data-locations: classpath:db/init.sql
       encoding: UTF-8
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # Redis 는 캐시로만 사용 (Redis Repository 스캔 끔)
+      repositories:
+        enabled: false
+
+# A06 메뉴 조회 Redis 캐시 스위치 (기본 켬 → Redis 실행 필요: docker compose up -d redis)
+# Redis 없이 실행하려면 local.env 에 CACHE_ENABLED=false 추가
+app:
+  cache:
+    enabled: ${CACHE_ENABLED:true}
+    menus-ttl-seconds: 60
