@@ -6,8 +6,8 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 public record OrderCreateRequest(
-        @NotBlank @Email String customerEmail,
-        @NotBlank String deliveryAddress,
+        @NotBlank @Email String email,
+        @NotBlank String address,
         @NotBlank String postcode,
         @NotEmpty @Valid List<Item> items
 ) {

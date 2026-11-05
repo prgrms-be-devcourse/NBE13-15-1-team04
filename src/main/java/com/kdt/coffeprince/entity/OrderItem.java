@@ -35,14 +35,14 @@ public class OrderItem {
     private Integer quantity;
 
     @Column(name = "line_amount", nullable = false)
-    private Long lineAmount;
+    private Integer lineAmount;
 
     public OrderItem(Menu menu, int quantity) {
         this.menu = menu;
         this.menuName = menu.getName();
         this.unitPrice = menu.getPrice();
         this.quantity = quantity;
-        this.lineAmount = (long) menu.getPrice() * quantity;
+        this.lineAmount = menu.getPrice() * quantity;
     }
 
     public Long getMenuId() {

@@ -306,6 +306,7 @@ PUT {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}/availability
 Content-Type: application/json
 
 {
+
   "available": false
 }
 
@@ -325,8 +326,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {
@@ -345,8 +346,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {
@@ -361,8 +362,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {
@@ -378,8 +379,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "not-an-email",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "not-an-email",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {
@@ -394,8 +395,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": []
 }
@@ -406,8 +407,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {
@@ -422,7 +423,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
+  "email": "buyer@example.com"
+}
 
 ### A11 주문 접수 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND, fieldErrors={}
 ### TODO: 상태는 404 이지만 본문이 Spring 기본 형식 {timestamp,status,error,path} (OrderService.place 가 ResponseStatusException 을 던짐)
@@ -430,8 +432,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {
@@ -447,8 +449,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 다른로 99",
+  "email": "buyer@example.com",
+  "address": "서울시 다른로 99",
   "postcode": "01234",
   "items": [
     {
@@ -465,8 +467,8 @@ POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "customerEmail": "buyer@example.com",
-  "deliveryAddress": "서울시 실습로 10 101호",
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
   "postcode": "01234",
   "items": [
     {

@@ -1,23 +1,17 @@
 package com.kdt.coffeprince.dto;
 
-import com.kdt.coffeprince.constant.OrderStatus;
 import com.kdt.coffeprince.entity.Order;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-
+// 이메일별 주문 목록 한 줄 (명세서: id, orderedAt, shippingDate, totalAmount, status)
 public record OrderSummaryResponse(
-        Long orderId, OffsetDateTime orderedAt, LocalDate deliveryDate, Integer totalAmount, OrderStatus status) {
-
-    private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
+        Long id, String orderedAt, String shippingDate, Integer totalAmount, String status) {
 
     public static OrderSummaryResponse from(Order order) {
         return new OrderSummaryResponse(
                 order.getOrderId(),
-                order.getOrderedAt().atZone(SEOUL).toOffsetDateTime(),
-                order.getDeliveryDate(),
+                OrderResponse.toSeoulTime(order.getOrderedAt()),
+                order.getDeliveryDate().toString(),
                 order.getTotalAmount(),
-                order.getStatus());
+                OrderResponse.toResponseStatus(order.getStatus()));
     }
 }
