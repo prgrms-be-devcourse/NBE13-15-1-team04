@@ -14,10 +14,8 @@ import com.kdt.coffeprince.repository.MenuRepository;
 import com.kdt.coffeprince.repository.OrderItemRepository;
 import com.kdt.coffeprince.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -71,10 +69,10 @@ public class OrderService {
         for (OrderCreateRequest.Item item : request.items()) {
             Menu menu = menus.get(item.menuId());
             if (menu == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "메뉴 못 찾음");
+                throw new BusinessException(ErrorCode.MENU_NOT_FOUND);
             }
             if (!menu.getIsAvailable()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "메뉴 안됨");
+                throw new BusinessException(ErrorCode.MENU_UNAVAILABLE);
             }
         }
 
@@ -87,7 +85,7 @@ public class OrderService {
                 .anyMatch(o -> !o.getDeliveryAddress().trim().equals(address)
                         || !o.getPostcode().trim().equals(postcode));
         if (mismatch) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "ADDRESS_MISMATCH");
+            throw new BusinessException(ErrorCode.ADDRESS_MISMATCH);
         }
 
         // 주문 + 항목 저장 (한 트랜잭션, cascade)
@@ -111,7 +109,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderSummaryResponse> findByCustomerEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, Map.of("email", "이메일은 필수입니다."));
         }
         return orderRepository.findByCustomerEmailOrderByOrderedAtDescOrderIdDesc(email.trim()).stream()
                 .map(OrderSummaryResponse::from)
@@ -122,7 +120,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderResponse find(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
         return OrderResponse.from(order);
     }
 
