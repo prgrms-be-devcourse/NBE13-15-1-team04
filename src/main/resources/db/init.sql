@@ -2,8 +2,7 @@ SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS category (
     category_id BIGINT       NOT NULL AUTO_INCREMENT,
-    name        VARCHAR(50)  NOT NULL,
-    description VARCHAR(300) NULL,
+    name        VARCHAR(30)  NOT NULL,
     created_at  DATETIME(6)  NOT NULL,
     updated_at  DATETIME(6)  NOT NULL,
     PRIMARY KEY (category_id)
@@ -12,8 +11,7 @@ CREATE TABLE IF NOT EXISTS category (
 CREATE TABLE IF NOT EXISTS menu (
     menu_id      BIGINT       NOT NULL AUTO_INCREMENT,
     category_id  BIGINT       NOT NULL,
-    -- 메뉴명 검색(A20)은 영문 대소문자를 구분하므로 이 컬럼만 case-sensitive 콜레이션 사용
-    name         VARCHAR(100) NOT NULL COLLATE utf8mb4_0900_as_cs,
+    name         VARCHAR(100) NOT NULL,
     description  VARCHAR(300) NULL,
     price        INT          NOT NULL,
     is_available BIT(1)       NOT NULL,
@@ -57,12 +55,11 @@ CREATE TABLE IF NOT EXISTS order_item (
     CONSTRAINT fk_order_item_menu  FOREIGN KEY (menu_id)  REFERENCES menu (menu_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO category (category_id, name, description, created_at, updated_at) VALUES
-    (1, 'Single Origin', 'Coffee beans from a single farm or region.', NOW(6), NOW(6)),
-    (2, 'Blend', 'Coffee beans blended from multiple origins.', NOW(6), NOW(6))
+INSERT INTO category (category_id, name, created_at, updated_at) VALUES
+    (1, 'Single Origin', NOW(6), NOW(6)),
+    (2, 'Blend', NOW(6), NOW(6))
 ON DUPLICATE KEY UPDATE
     name = VALUES(name),
-    description = VALUES(description),
     updated_at = NOW(6);
 
 INSERT INTO menu (menu_id, category_id, name, description, price, is_available, created_at, updated_at) VALUES

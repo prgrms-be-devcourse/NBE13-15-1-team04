@@ -14,18 +14,15 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByOrderByCategoryIdAsc();
 
-    boolean existsByName(String name);
+    // A03: 대소문자까지 똑같은 이름의 개수 (테이블 기본 콜레이션은 Decaf와 decaf를 같게 보므로 utf8mb4_bin 으로 비교)
+    @Query(value = "SELECT COUNT(*) FROM category WHERE name COLLATE utf8mb4_bin = :name",
+            nativeQuery = true)
+    long countSameNameExactly(@Param("name") String name);
 
-    boolean existsByNameAndCategoryIdNot(String name, Long id);
-
-    // A04: 대소문자까지 똑같은 이름의 개수 (DB 기본 설정은 Decaf와 decaf를 같게 봄). 자기 자신은 제외
+    // A04: 위와 같되 자기 자신은 제외
     @Query(value = "SELECT COUNT(*) FROM category WHERE name COLLATE utf8mb4_bin = :name AND category_id <> :id",
             nativeQuery = true)
     long countSameNameExactly(@Param("name") String name, @Param("id") Long id);
-
-    // A05: 이 카테고리에 속한 메뉴 개수 (Menu 엔티티를 거치지 않고 menu 테이블을 직접 센다)
-    @Query(value = "SELECT COUNT(*) FROM menu WHERE category_id = :categoryId", nativeQuery = true)
-    long countMenusByCategoryId(@Param("categoryId") Long categoryId);
 
     // A05: 카테고리만 바로 삭제 (cascade로 menu 테이블을 읽지 않도록)
     @Modifying

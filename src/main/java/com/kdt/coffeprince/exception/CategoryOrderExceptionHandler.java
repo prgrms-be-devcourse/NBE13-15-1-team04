@@ -1,6 +1,5 @@
 package com.kdt.coffeprince.exception;
 
-import com.kdt.coffeprince.controller.CategoryController;
 import com.kdt.coffeprince.controller.DeliveryBatchesController;
 import com.kdt.coffeprince.controller.OrderController;
 import com.kdt.coffeprince.controller.ReorderController;
@@ -29,7 +28,7 @@ import java.util.Map;
 // 직접 던지는 BusinessException은 BusinessExceptionHandler가 처리한다
 // 팀 공통 틀이 정해지면 ApiExceptionAdvice와 합칠 예정
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(assignableTypes = {CategoryController.class, OrderController.class, ReorderController.class,
+@RestControllerAdvice(assignableTypes = {OrderController.class, ReorderController.class,
         DeliveryBatchesController.class})
 public class CategoryOrderExceptionHandler {
 

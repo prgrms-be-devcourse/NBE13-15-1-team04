@@ -19,16 +19,14 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Category {
 
+    public static final int MAX_NAME_LENGTH = 30;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = MAX_NAME_LENGTH)
     private String name;
-
-    @Column
-    private String description;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -48,6 +46,10 @@ public class Category {
 
     public void rename(String name) {
         this.name = name;
+    }
+
+    public boolean isUsed() {
+        return !this.menus.isEmpty();
     }
 
 }

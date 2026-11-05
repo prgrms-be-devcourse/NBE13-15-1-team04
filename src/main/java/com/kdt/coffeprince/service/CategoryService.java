@@ -4,15 +4,13 @@ import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
 import com.kdt.coffeprince.dto.CategoryUpdateRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
+import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
-import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,14 +32,12 @@ public class CategoryService {
     }
 
     public CategoryResponse find(Long categoryId) {
-        return CategoryResponse.from(getOrThrow(categoryId));
+        return CategoryResponse.from(categoryRepository.getOrThrow(categoryId));
     }
 
     // A15: 카테고리별 메뉴 목록
     public List<MenuResponse> findMenus(Long categoryId) {
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
-        }
+        categoryRepository.getOrThrow(categoryId);
         return menuRepository.findAllByCategory_CategoryIdOrderByMenuIdAsc(categoryId).stream()
                 .map(MenuResponse::from)
                 .toList();
@@ -49,22 +45,25 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse create(CategoryRequest request) {
-        String name = request.name().trim();
-        if (categoryRepository.existsByName(name)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "카테고리 중복");
+        String name = request.name();
+
+        if (categoryRepository.countSameNameExactly(name) > 0) {
+            throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED);
         }
+
         Category saved = categoryRepository.saveAndFlush(new Category(name));
         return CategoryResponse.from(saved);
     }
 
     @Transactional
     public CategoryResponse update(Long categoryId, CategoryUpdateRequest request) {
-        Category category = getOrThrow(categoryId);
-        String name = request.name().trim();
+        Category category = categoryRepository.getOrThrow(categoryId);
+        String name = request.name();
 
         if (categoryRepository.countSameNameExactly(name, categoryId) > 0) {
             throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED);
         }
+
         category.rename(name);
         categoryRepository.flush();
         return CategoryResponse.from(category);
@@ -72,19 +71,12 @@ public class CategoryService {
 
     @Transactional
     public void delete(Long categoryId) {
-        getOrThrow(categoryId);
-        if (categoryRepository.countMenusByCategoryId(categoryId) > 0) {
+        Category category = categoryRepository.getOrThrow(categoryId);
+
+        if (category.isUsed()) {
             throw new BusinessException(ErrorCode.CATEGORY_IN_USE);
         }
+
         categoryRepository.deleteCategoryById(categoryId);
-    }
-
-    public boolean exists(Long categoryId) {
-        return categoryRepository.existsById(categoryId);
-    }
-
-    private Category getOrThrow(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 }
