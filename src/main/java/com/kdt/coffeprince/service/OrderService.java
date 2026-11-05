@@ -107,6 +107,7 @@ public class OrderService {
     }
 
     // ---------- A12 이메일별 주문 ----------
+    @Transactional(readOnly = true)
     public List<OrderSummaryResponse> findByCustomerEmail(String email) {
         if (email == null || email.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
@@ -117,6 +118,7 @@ public class OrderService {
     }
 
     // ---------- A13 주문 상세 ----------
+    @Transactional(readOnly = true)
     public OrderResponse find(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ORDER_NOT_FOUND"));
@@ -142,6 +144,7 @@ public class OrderService {
     }
 
     // ---------- A14 배송 묶음 ----------
+    @Transactional(readOnly = true)
     public List<DeliveryBatchResponse> findDeliveryBatches(LocalDate shippingDate) {
         List<Order> orders = orderRepository.findByDeliveryDateAndStatus(shippingDate, OrderStatus.PLACED);
 
