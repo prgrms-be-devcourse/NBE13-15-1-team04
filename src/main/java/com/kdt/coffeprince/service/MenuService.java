@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.service;
 
+import com.kdt.coffeprince.config.RedisCacheConfig;
 import com.kdt.coffeprince.dto.CreateMenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.dto.PutMenuRequest;
@@ -12,6 +13,8 @@ import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
 import com.kdt.coffeprince.dto.CreateMenuRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,8 @@ public class MenuService {
         return MenuResponse.from(menu);
     }
 
+    // A06 캐시: Redis 키 "menus::all" 에 저장, TTL 동안 DB 재조회 안 함
+    @Cacheable(cacheNames = RedisCacheConfig.MENUS, key = "'all'")
     public List<MenuResponse> all() {
         return menuRepository.findAll()
                 .stream()
@@ -35,6 +40,7 @@ public class MenuService {
                 .toList();
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public MenuResponse updateMenu(Long menuId, PutMenuRequest body) {
         Menu menu = menuRepository.findById(menuId)
@@ -65,6 +71,7 @@ public class MenuService {
     }
 
     // A21: 판매 여부 변경
+    @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public MenuResponse changeAvailability(Long menuId, boolean available) {
         Menu menu = this.menuRepository.findById(menuId)
@@ -73,6 +80,7 @@ public class MenuService {
         return MenuResponse.from(menu);
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public MenuResponse createMenu(CreateMenuRequest body) {
         Category category = categoryRepository.findById(body.categoryId())
@@ -92,6 +100,7 @@ public class MenuService {
         return MenuResponse.from(savedMenu);
     }
 
+    @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public void deleteMenu(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
