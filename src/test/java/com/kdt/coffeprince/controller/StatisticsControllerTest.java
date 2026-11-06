@@ -129,8 +129,9 @@ class StatisticsControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("미래 날짜는 조회할 수 없습니다"));
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
+                .andExpect(jsonPath("$.fieldErrors.date").value("오늘 또는 그 이전 날짜여야 합니다."));
 
         verifyNoInteractions(this.statisticsService);
     }
@@ -210,8 +211,9 @@ class StatisticsControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("미래 날짜는 조회할 수 없습니다"));
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
+                .andExpect(jsonPath("$.fieldErrors.date").value("오늘 또는 그 이전 날짜여야 합니다."));
 
         verifyNoInteractions(this.statisticsService);
     }
@@ -318,8 +320,9 @@ class StatisticsControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("미래 날짜는 조회할 수 없습니다"));
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
+                .andExpect(jsonPath("$.fieldErrors.date").value("오늘 또는 그 이전 날짜여야 합니다."));
 
         verifyNoInteractions(this.statisticsService);
     }

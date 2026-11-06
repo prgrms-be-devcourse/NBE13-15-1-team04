@@ -98,17 +98,14 @@ GET {{baseUrl}}/menus
 GET {{baseUrl}}/menus/{{searchMenuId}}
 
 ### A07 메뉴 상세 조회 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND
-### TODO: 500 에러 발생 중 (MenuService.one 의 orElseThrow() 가 NoSuchElementException 을 던져 처리되지 않음)
 @invalidMenuId=99999999
 GET {{baseUrl}}/menus/{{invalidMenuId}}
 
 ### A07 메뉴 상세 조회 실패 (유효하지 않은 메뉴 ID 타입) — 기대: 400 VALIDATION_ERROR, fieldErrors.menuId
-### TODO: 상태는 400 이지만 본문이 Spring 기본 형식 {timestamp,status,error,path} 로 나옴 (code·message·fieldErrors 없음)
 @searchMenuIdWithInvalidType=asd123
 GET {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}
 
 ### A07 메뉴 상세 조회 실패 (메뉴 ID 0) — 기대: 400 VALIDATION_ERROR
-### TODO: 500 에러 발생 중 (@Positive 검사가 없어 조회까지 가서 NoSuchElementException)
 GET {{baseUrl}}/menus/0
 
 ### A08 메뉴 등록 (기대: 201, available=true 로 생성된 Menu / 응답 id 를 아래 @createdMenuId 에 적을 것)
@@ -123,7 +120,6 @@ Content-Type: application/json
 }
 
 ### A08 메뉴 등록 실패 (name 공백) — 기대: 400 VALIDATION_ERROR, fieldErrors.name
-### TODO: 상태는 400 이지만 본문이 {"code":"BAD_REQUEST","message":"공백일 수 없습니다"} 로 나옴 (ApiExceptionAdvice 의 ApiError 형식, fieldErrors 없음)
 POST {{baseUrl}}/menus
 Content-Type: application/json
 
@@ -135,7 +131,6 @@ Content-Type: application/json
 }
 
 ### A08 메뉴 등록 실패 (price 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.price
-### TODO: 본문이 {"code":"BAD_REQUEST",...} 형식. 또한 명세의 가격 상한(1,000,000)·설명 300자·description 필수 검사가 없음
 POST {{baseUrl}}/menus
 Content-Type: application/json
 
@@ -147,7 +142,6 @@ Content-Type: application/json
 }
 
 ### A08 메뉴 등록 실패 (price 자료형 오류) — 기대: 400 VALIDATION_ERROR, fieldErrors.price
-### TODO: 본문이 Spring 기본 형식 {timestamp,status,error,path} 로 나옴 (HttpMessageNotReadableException 미처리)
 POST {{baseUrl}}/menus
 Content-Type: application/json
 
@@ -159,7 +153,6 @@ Content-Type: application/json
 }
 
 ### A08 메뉴 등록 실패 (존재하지 않는 카테고리) — 기대: 404 CATEGORY_NOT_FOUND
-### TODO: 상태는 404 이지만 본문이 {"code":"NOT_FOUND","message":"카테고리를 찾을 수 없습니다."} (code 가 명세와 다르고 fieldErrors 없음)
 POST {{baseUrl}}/menus
 Content-Type: application/json
 
@@ -183,7 +176,6 @@ Content-Type: application/json
 }
 
 ### A09 메뉴 수정 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND
-### TODO: 상태는 404 이지만 본문이 {"code":"NOT_FOUND","message":"메뉴를 찾을 수 없습니다."} (code 가 명세와 다르고 fieldErrors 없음)
 PUT {{baseUrl}}/menus/{{invalidMenuId}}
 Content-Type: application/json
 
@@ -195,7 +187,6 @@ Content-Type: application/json
 }
 
 ### A09 메뉴 수정 실패 (메뉴 ID 타입) — 기대: 400 VALIDATION_ERROR, fieldErrors.menuId
-### TODO: 본문이 Spring 기본 형식 {timestamp,status,error,path} 로 나옴
 PUT {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}
 Content-Type: application/json
 
@@ -207,7 +198,6 @@ Content-Type: application/json
 }
 
 ### A09 메뉴 수정 실패 (name 공백) — 기대: 400 VALIDATION_ERROR, fieldErrors.name
-### TODO: 본문이 {"code":"BAD_REQUEST","message":"공백일 수 없습니다"} 형식
 PUT {{baseUrl}}/menus/{{createdMenuId}}
 Content-Type: application/json
 
@@ -236,18 +226,15 @@ GET {{baseUrl}}/categories/{{invalidCategoryId}}/menus
 GET {{baseUrl}}/menus/available
 
 ### A20 메뉴명 검색 (기대: 200, "Columbia" 가 들어간 메뉴 1·3)
-### TODO: 명세의 쿼리 이름은 keyword 인데 구현은 name 을 받음. 명세상 대소문자 구분인데 구현은 IgnoreCase
 GET {{baseUrl}}/menus/search?name=Columbia
 
 ### A20 메뉴명 검색 (결과 없음) — 기대: 200 + []
 GET {{baseUrl}}/menus/search?name=NoSuchMenu
 
 ### A20 메뉴명 검색 실패 (검색어 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.keyword
-### TODO: 본문이 Spring 기본 형식 {timestamp,status,error,path} 로 나옴 (MissingServletRequestParameterException 미처리)
 GET {{baseUrl}}/menus/search
 
 ### A20 메뉴명 검색 실패 (검색어 공백) — 기대: 400 VALIDATION_ERROR (앞뒤 공백 제거 후 1~100자)
-### TODO: 200 과 전체 메뉴가 반환됨 (빈 문자열 검사 없음)
 GET {{baseUrl}}/menus/search?name=
 
 
@@ -293,7 +280,6 @@ Content-Type: application/json
 }
 
 ### A21 판매 여부 변경 실패 (메뉴 ID 타입) — 기대: 400 VALIDATION_ERROR, fieldErrors.menuId
-### TODO: 본문이 Spring 기본 형식 {timestamp,status,error,path} 로 나옴 (MenuController 는 CategoryOrderExceptionHandler 적용 대상이 아님)
 PUT {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}/availability
 Content-Type: application/json
 
@@ -303,7 +289,6 @@ Content-Type: application/json
 }
 
 ### A21 판매 여부 변경 실패 (메뉴 ID 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.menuId
-### TODO: 본문이 Spring 기본 형식으로 나옴 (@Positive 위반이 HandlerMethodValidationException 으로 가지만 MenuController 용 핸들러 없음)
 PUT {{baseUrl}}/menus/0/availability
 Content-Type: application/json
 
@@ -553,10 +538,8 @@ GET {{baseUrl}}/orders?email=not-an-email
 @orderId=6
 GET {{baseUrl}}/orders/{{orderId}}
 
-### TODO: 존재하는 주문인데 500 에러 발생 중 (OrderService.find 에 @Transactional 이 없고 open-in-view=false 라 items 지연 로딩 실패로 추정)
 
 ### A13 주문 상세 실패 (존재하지 않는 주문) — 기대: 404 ORDER_NOT_FOUND, fieldErrors={}
-### TODO: 상태는 404 이지만 본문이 Spring 기본 형식 (ResponseStatusException)
 @invalidOrderId=99999999
 GET {{baseUrl}}/orders/{{invalidOrderId}}
 
@@ -565,7 +548,6 @@ GET {{baseUrl}}/orders/{{invalidOrderId}}
 GET {{baseUrl}}/orders/{{orderIdWithInvalidType}}
 
 ### A13 주문 상세 실패 (주문 ID 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.orderId
-### TODO: 404 가 나옴 (get 에 @Positive 가 없어 조회까지 감)
 GET {{baseUrl}}/orders/0
 
 ### A22 주문 메모 수정 (기대: 200, memo 만 바뀐 전체 Order)
@@ -649,7 +631,6 @@ POST {{baseUrl}}/orders/{{invalidOrderId}}/cancel
 POST {{baseUrl}}/orders/{{orderIdWithInvalidType}}/cancel
 
 ### A10 메뉴 삭제 실패 (주문에 사용된 메뉴) — 기대: 409 MENU_IN_USE, fieldErrors={}  ({{createdMenuId}} 는 위 A11 에서 주문에 사용됨)
-### TODO: 500 에러 발생 중 (주문 항목 FK 때문에 DataIntegrityViolationException, MENU_IN_USE 검사 없음)
 DELETE {{baseUrl}}/menus/{{createdMenuId}}
 
 ### A10 메뉴 삭제 — 준비: 주문에 쓰이지 않은 메뉴를 하나 등록하고 응답 id 를 @deleteMenuId 에 적을 것 (기대: 201)
@@ -668,28 +649,23 @@ Content-Type: application/json
 DELETE {{baseUrl}}/menus/{{deleteMenuId}}
 
 ### A10 메뉴 삭제 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND, fieldErrors={}
-### TODO: 상태는 404 이지만 본문이 {"code":"NOT_FOUND",...} (code 가 명세와 다르고 fieldErrors 없음)
 DELETE {{baseUrl}}/menus/{{invalidMenuId}}
 
 ### A10 메뉴 삭제 실패 (메뉴 ID 타입) — 기대: 400 VALIDATION_ERROR, fieldErrors.menuId
-### TODO: 본문이 Spring 기본 형식 {timestamp,status,error,path}
 DELETE {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}
 
 ### A14 배송 묶음 (기대: 200, 이메일순 DeliveryBatch[] / orderIds 오름차순, 같은 메뉴 수량 합산)
-### TODO: PLACED 주문이 있는 날짜로 조회하면 500 에러 발생 중 (findDeliveryBatches 에 @Transactional 이 없어 items 지연 로딩 실패로 추정) / 주문 없는 날짜는 200 + []
-@deliveryDate=2026-11-05
-GET {{baseUrl}}/delivery-batches?deliveryDate={{deliveryDate}}
+@shippingDate=2026-11-05
+GET {{baseUrl}}/delivery-batches?shippingDate={{shippingDate}}
 
 ### A14 배송 묶음 (주문 없는 날짜) — 기대: 200 + []
-GET {{baseUrl}}/delivery-batches?deliveryDate=2026-01-01
+GET {{baseUrl}}/delivery-batches?shippingDate=2026-01-01
 
-### A14 배송 묶음 실패 (날짜 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.deliveryDate
-### TODO: 본문이 Spring 기본 형식 (MissingServletRequestParameterException 미처리)
+### A14 배송 묶음 실패 (날짜 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.shippingDate
 GET {{baseUrl}}/delivery-batches
 
-### A14 배송 묶음 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.deliveryDate
-### TODO: 본문이 Spring 기본 형식 (MethodArgumentTypeMismatchException 미처리). 2000~2099 범위 검사도 없음
-GET {{baseUrl}}/delivery-batches?deliveryDate=2026-13-45
+### A14 배송 묶음 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.shippingDate
+GET {{baseUrl}}/delivery-batches?shippingDate=2026-13-45
 
 ### A17 접수일별 주문 통계 (기대: 200, OrderStatistics 단일 객체)
 @statDate=2026-11-04
@@ -702,11 +678,9 @@ GET {{baseUrl}}/statistics/orders
 GET {{baseUrl}}/statistics/orders?date=2026-01-01
 
 ### A17 접수일별 주문 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR, fieldErrors.date
-### TODO: 상태는 400 이지만 본문이 {"code":"BAD_REQUEST","message":"미래 날짜는 조회할 수 없습니다"} (fieldErrors 없음)
 GET {{baseUrl}}/statistics/orders?date=2099-01-01
 
 ### A17 접수일별 주문 통계 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.date
-### TODO: 본문이 Spring 기본 형식 (MethodArgumentTypeMismatchException 미처리)
 GET {{baseUrl}}/statistics/orders?date=abc
 
 ### A18 접수일별 메뉴 통계 (기대: 200, MenuStatistics[] 메뉴 ID → 단가 → 메뉴명 순, PLACED 만 집계)
@@ -716,7 +690,6 @@ GET {{baseUrl}}/statistics/menus?date={{statDate}}
 GET {{baseUrl}}/statistics/menus?date=2026-01-01
 
 ### A18 접수일별 메뉴 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR
-### TODO: 본문이 {"code":"BAD_REQUEST",...} 형식
 GET {{baseUrl}}/statistics/menus?date=2099-01-01
 
 ### A24 접수일별 고객 통계 (기대: 200, CustomerStatistics[] 이메일 오름차순, 전부 취소한 고객도 포함)
@@ -726,5 +699,4 @@ GET {{baseUrl}}/statistics/customers?date={{statDate}}
 GET {{baseUrl}}/statistics/customers?date=2026-01-01
 
 ### A24 접수일별 고객 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR
-### TODO: 본문이 {"code":"BAD_REQUEST",...} 형식
 GET {{baseUrl}}/statistics/customers?date=2099-01-01

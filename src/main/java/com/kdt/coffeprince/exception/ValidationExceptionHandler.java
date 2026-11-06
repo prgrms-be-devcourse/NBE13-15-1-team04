@@ -73,6 +73,7 @@ public class ValidationExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
     }
 
+    // 경로 ID 가 정수로 변환되지 않음. 예: /menus/abc (날짜 쿼리는 String + @UrlDate 로 받아 여기로 오지 않는다)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException err) {
         return ResponseEntity.badRequest().body(
