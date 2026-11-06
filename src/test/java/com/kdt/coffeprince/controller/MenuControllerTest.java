@@ -1,8 +1,7 @@
 package com.kdt.coffeprince.controller;
 
-import com.kdt.coffeprince.dto.CreateMenuRequest;
+import com.kdt.coffeprince.dto.MenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
-import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.service.MenuService;
@@ -40,7 +39,7 @@ class MenuControllerTest {
                 2L, 1L, "카페라떼", 5000, "우유가 들어간 커피", true
         );
 
-        when(menuService.createMenu(any(CreateMenuRequest.class)))
+        when(menuService.createMenu(any(MenuRequest.class)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/v1/menus")
@@ -58,7 +57,7 @@ class MenuControllerTest {
                 .andExpect(jsonPath("$.name").value("카페라떼"))
                 .andExpect(jsonPath("$.price").value(5000));
 
-        verify(menuService).createMenu(any(CreateMenuRequest.class));
+        verify(menuService).createMenu(any(MenuRequest.class));
     }
 
     @Test
@@ -67,7 +66,7 @@ class MenuControllerTest {
                 1L, 1L, "아메리카노", 4500, "가격 수정 테스트", true
         );
 
-        when(menuService.updateMenu(eq(1L), any(PutMenuRequest.class)))
+        when(menuService.updateMenu(eq(1L), any(MenuRequest.class)))
                 .thenReturn(response);
 
         mockMvc.perform(put("/api/v1/menus/1")
@@ -86,7 +85,7 @@ class MenuControllerTest {
                 .andExpect(jsonPath("$.description")
                         .value("가격 수정 테스트"));
 
-        verify(menuService).updateMenu(eq(1L), any(PutMenuRequest.class));
+        verify(menuService).updateMenu(eq(1L), any(MenuRequest.class));
     }
 
     @Test
@@ -165,7 +164,7 @@ class MenuControllerTest {
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
 
         verify(menuService, never())
-                .createMenu(any(CreateMenuRequest.class));
+                .createMenu(any(MenuRequest.class));
     }
 
     // A21 판매 여부 변경 — 예외 응답이 명세 형식(code·message·fieldErrors)인지 확인

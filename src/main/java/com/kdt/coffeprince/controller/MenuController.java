@@ -61,7 +61,7 @@ public class MenuController {
     @PutMapping("/{menuId}")
     public MenuResponse updateMenu(
             @Positive @PathVariable("menuId") Long menuId,
-            @Valid @RequestBody PutMenuRequest body
+            @Valid @RequestBody MenuRequest body
     ) {
         return menuService.updateMenu(menuId, body);
     }
@@ -88,7 +88,7 @@ public class MenuController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MenuResponse createMenu(
-            @Valid @RequestBody CreateMenuRequest body
+            @Valid @RequestBody MenuRequest body
     ) {
         return menuService.createMenu(body);
     }

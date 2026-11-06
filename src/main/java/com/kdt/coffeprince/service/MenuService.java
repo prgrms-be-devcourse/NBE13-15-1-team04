@@ -1,9 +1,8 @@
 package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.config.RedisCacheConfig;
-import com.kdt.coffeprince.dto.CreateMenuRequest;
+import com.kdt.coffeprince.dto.MenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
-import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.entity.Menu;
 import com.kdt.coffeprince.exception.BusinessException;
@@ -25,6 +24,7 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
 
 
+    @Transactional(readOnly = true)
     public MenuResponse one(Long menuId) {
         Menu menu = menuRepository.getOrThrow(menuId);
         return MenuResponse.from(menu);
@@ -32,6 +32,7 @@ public class MenuService {
 
     // A06 캐시: Redis 키 "menus::all" 에 저장, TTL 동안 DB 재조회 안 함
     @Cacheable(cacheNames = RedisCacheConfig.MENUS, key = "'all'")
+    @Transactional(readOnly = true)
     public List<MenuResponse> all() {
         return menuRepository.findAllByOrderByMenuIdAsc()
                 .stream()
@@ -41,7 +42,7 @@ public class MenuService {
 
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
-    public MenuResponse updateMenu(Long menuId, PutMenuRequest body) {
+    public MenuResponse updateMenu(Long menuId, MenuRequest body) {
         Menu menu = menuRepository.getOrThrow(menuId);
         Category category = categoryRepository.getOrThrow(body.categoryId());
 
@@ -55,6 +56,7 @@ public class MenuService {
         return MenuResponse.from(menu);
     }
 
+    @Transactional(readOnly = true)
     public List<MenuResponse> available() {
         return menuRepository.findByIsAvailableTrueOrderByMenuIdAsc()
                 .stream()
@@ -73,7 +75,7 @@ public class MenuService {
 
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
-    public MenuResponse createMenu(CreateMenuRequest body) {
+    public MenuResponse createMenu(MenuRequest body) {
         Category category = this.categoryRepository.getOrThrow(body.categoryId());
 
         Menu menu = new Menu(

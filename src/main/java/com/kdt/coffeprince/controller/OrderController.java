@@ -1,6 +1,6 @@
 package com.kdt.coffeprince.controller;
 
-import com.kdt.coffeprince.dto.CreateOrderRequest;
+import com.kdt.coffeprince.dto.OrderRequest;
 import com.kdt.coffeprince.dto.OrderMemoRequest;
 import com.kdt.coffeprince.dto.OrderResponse;
 import com.kdt.coffeprince.dto.OrderSummaryResponse;
@@ -27,7 +27,7 @@ public class OrderController {
 
     @PostMapping                                           // A11
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResponse place(@Valid @RequestBody CreateOrderRequest request) {
+    public OrderResponse place(@Valid @RequestBody OrderRequest request) {
         return orderService.place(request);
     }
 
