@@ -3,7 +3,7 @@ SET NAMES utf8mb4;
 CREATE TABLE IF NOT EXISTS category (
     category_id BIGINT       NOT NULL AUTO_INCREMENT,
     name        VARCHAR(50)  NOT NULL,
-    description VARCHAR(255) NULL,
+    description VARCHAR(300) NULL,
     created_at  DATETIME(6)  NOT NULL,
     updated_at  DATETIME(6)  NOT NULL,
     PRIMARY KEY (category_id)
@@ -12,8 +12,9 @@ CREATE TABLE IF NOT EXISTS category (
 CREATE TABLE IF NOT EXISTS menu (
     menu_id      BIGINT       NOT NULL AUTO_INCREMENT,
     category_id  BIGINT       NOT NULL,
-    name         VARCHAR(100) NOT NULL,
-    description  VARCHAR(255) NULL,
+    -- 메뉴명 검색(A20)은 영문 대소문자를 구분하므로 이 컬럼만 case-sensitive 콜레이션 사용
+    name         VARCHAR(100) NOT NULL COLLATE utf8mb4_0900_as_cs,
+    description  VARCHAR(300) NULL,
     price        INT          NOT NULL,
     is_available BIT(1)       NOT NULL,
     created_at   DATETIME(6)  NOT NULL,

@@ -11,7 +11,6 @@ import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
-import com.kdt.coffeprince.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,10 +24,10 @@ import java.util.List;
 public class MenuService {
     private final MenuRepository menuRepository;
     private final CategoryRepository categoryRepository;
-    private final OrderItemRepository orderItemRepository;
+
 
     public MenuResponse one(Long menuId) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow();
+        Menu menu = menuRepository.getOrThrow(menuId);
         return MenuResponse.from(menu);
     }
 
@@ -44,15 +43,8 @@ public class MenuService {
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public MenuResponse updateMenu(Long menuId, PutMenuRequest body) {
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() ->
-                        new NotFoundException("메뉴를 찾을 수 없습니다.")
-                );
-
-        Category category = categoryRepository.findById(body.categoryId())
-                .orElseThrow(() ->
-                        new NotFoundException("카테고리를 찾을 수 없습니다.")
-                );
+        Menu menu = menuRepository.getOrThrow(menuId);
+        Category category = categoryRepository.getOrThrow(body.categoryId());
 
         menu.update(
                 category,
@@ -75,8 +67,7 @@ public class MenuService {
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public MenuResponse changeAvailability(Long menuId, boolean available) {
-        Menu menu = this.menuRepository.findById(menuId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_NOT_FOUND));
+        Menu menu = this.menuRepository.getOrThrow(menuId);
         menu.changeAvailability(available);
         return MenuResponse.from(menu);
     }
@@ -84,10 +75,7 @@ public class MenuService {
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public MenuResponse createMenu(CreateMenuRequest body) {
-        Category category = categoryRepository.findById(body.categoryId())
-                .orElseThrow(() ->
-                        new NotFoundException("카테고리를 찾을 수 없습니다.")
-                );
+        Category category = this.categoryRepository.getOrThrow(body.categoryId());
 
         Menu menu = new Menu(
                 category,
@@ -104,22 +92,16 @@ public class MenuService {
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
     public void deleteMenu(Long menuId) {
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() ->
-                        new NotFoundException("메뉴를 찾을 수 없습니다.")
-                );
-
-        // 주문 항목이 참조 중인 메뉴는 삭제할 수 없다 (FK 위반으로 500이 나던 것을 409로)
-        if (orderItemRepository.existsByMenu_MenuId(menuId)) {
+        Menu menu = this.menuRepository.getOrThrow(menuId);
+        if (menu.isUsed()) {
             throw new BusinessException(ErrorCode.MENU_IN_USE);
         }
-
         menuRepository.delete(menu);
     }
 
     @Transactional(readOnly = true)
     public List<MenuResponse> searchMenus(String name) {
-        return menuRepository.findByNameContainingIgnoreCase(name)
+        return menuRepository.findByNameContaining(name)
                 .stream()
                 .map(MenuResponse::from)
                 .toList();

@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1030" viewBox="0 0 1900 1030">
+<defs>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="7" stdDeviation="11" flood-color="#22395E" flood-opacity="0.09"/></filter>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#7186A6"/></marker>
+</defs>
+<rect x="0" y="0" width="1900" height="1030" rx="0" fill="#F6F9FD" stroke="none" stroke-width="1"  />
+<rect x="0" y="0" width="1900" height="14" rx="0" fill="#214E78" stroke="none" stroke-width="1"  />
+<text x="65" y="84" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="44" font-weight="800" fill="#112641" letter-spacing="1">COFFE PRINCE</text>
+<text x="65" y="128" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="21" font-weight="500" fill="#516781">SYSTEM ARCHITECTURE  |  실제 dev 브랜치 코드 기준</text>
+<rect x="1478" y="64" width="144" height="30" rx="15" fill="#EAF3FF" stroke="none" stroke-width="1"  />
+<text x="1550.0" y="85" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#275B97">Java 21</text>
+<rect x="1633" y="64" width="195" height="30" rx="15" fill="#EAF3FF" stroke="none" stroke-width="1"  />
+<text x="1730.5" y="85" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#275B97">Spring Boot 4.1.2</text>
+<path d="M65,158 L1835,158" stroke="#E1E8F1" stroke-width="2" fill="none" stroke-linecap="round" />
+<text x="70" y="204" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="800" fill="#788BA3" letter-spacing="1">EXTERNAL</text>
+<text x="360" y="204" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="800" fill="#356A9B" letter-spacing="1">SPRING BOOT APPLICATION</text>
+<text x="1480" y="204" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="800" fill="#788BA3" letter-spacing="1">DATA STORAGE</text>
+<rect x="65" y="232" width="240" height="375" rx="16" fill="white" stroke="#DBE3ED" stroke-width="2" filter="url(#shadow)" />
+<rect x="65" y="232" width="240" height="8" rx="4" fill="#64748B" stroke="none" stroke-width="1"  />
+<text x="90" y="283" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="23" font-weight="800" fill="#12223B">Client</text>
+<text x="90" y="311" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="400" fill="#67778D">HTTP / JSON</text>
+<path d="M90,331 L280,331" stroke="#E5EAF1" stroke-width="1" fill="none" stroke-linecap="round" />
+<rect x="90" y="356" width="6" height="6" rx="3" fill="#64748B" stroke="none" stroke-width="1"  />
+<text x="107" y="369" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">웹 클라이언트</text>
+<rect x="90" y="393" width="6" height="6" rx="3" fill="#64748B" stroke="none" stroke-width="1"  />
+<text x="107" y="406" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">API 테스트 도구</text>
+<rect x="360" y="232" width="330" height="375" rx="16" fill="white" stroke="#DBE3ED" stroke-width="2" filter="url(#shadow)" />
+<rect x="360" y="232" width="330" height="8" rx="4" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="385" y="283" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="23" font-weight="800" fill="#12223B">REST Controllers</text>
+<text x="385" y="311" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="400" fill="#67778D">요청 URL 매핑 · 응답 반환</text>
+<path d="M385,331 L665,331" stroke="#E5EAF1" stroke-width="1" fill="none" stroke-linecap="round" />
+<rect x="385" y="356" width="6" height="6" rx="3" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="402" y="369" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">CategoryController</text>
+<rect x="385" y="393" width="6" height="6" rx="3" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="402" y="406" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">MenuController</text>
+<rect x="385" y="430" width="6" height="6" rx="3" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="402" y="443" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">OrderController</text>
+<rect x="385" y="467" width="6" height="6" rx="3" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="402" y="480" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">ReorderController</text>
+<rect x="385" y="504" width="6" height="6" rx="3" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="402" y="517" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">StatisticsController</text>
+<rect x="385" y="541" width="6" height="6" rx="3" fill="#2A72BA" stroke="none" stroke-width="1"  />
+<text x="402" y="554" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">DeliveryBatchesController</text>
+<rect x="740" y="232" width="320" height="375" rx="16" fill="white" stroke="#DBE3ED" stroke-width="2" filter="url(#shadow)" />
+<rect x="740" y="232" width="320" height="8" rx="4" fill="#4E7BCB" stroke="none" stroke-width="1"  />
+<text x="765" y="283" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="23" font-weight="800" fill="#12223B">Business Services</text>
+<text x="765" y="311" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="400" fill="#67778D">비즈니스 규칙 · 트랜잭션</text>
+<path d="M765,331 L1035,331" stroke="#E5EAF1" stroke-width="1" fill="none" stroke-linecap="round" />
+<rect x="765" y="356" width="6" height="6" rx="3" fill="#4E7BCB" stroke="none" stroke-width="1"  />
+<text x="782" y="369" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">CategoryService</text>
+<rect x="765" y="393" width="6" height="6" rx="3" fill="#4E7BCB" stroke="none" stroke-width="1"  />
+<text x="782" y="406" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">MenuService</text>
+<rect x="765" y="430" width="6" height="6" rx="3" fill="#4E7BCB" stroke="none" stroke-width="1"  />
+<text x="782" y="443" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">OrderService</text>
+<rect x="765" y="467" width="6" height="6" rx="3" fill="#4E7BCB" stroke="none" stroke-width="1"  />
+<text x="782" y="480" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">ReorderService</text>
+<rect x="765" y="504" width="6" height="6" rx="3" fill="#4E7BCB" stroke="none" stroke-width="1"  />
+<text x="782" y="517" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">StatisticsService</text>
+<rect x="1110" y="232" width="320" height="375" rx="16" fill="white" stroke="#DBE3ED" stroke-width="2" filter="url(#shadow)" />
+<rect x="1110" y="232" width="320" height="8" rx="4" fill="#7A69C2" stroke="none" stroke-width="1"  />
+<text x="1135" y="283" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="23" font-weight="800" fill="#12223B">JPA Repositories</text>
+<text x="1135" y="311" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="400" fill="#67778D">Spring Data JPA · 데이터 접근</text>
+<path d="M1135,331 L1405,331" stroke="#E5EAF1" stroke-width="1" fill="none" stroke-linecap="round" />
+<rect x="1135" y="356" width="6" height="6" rx="3" fill="#7A69C2" stroke="none" stroke-width="1"  />
+<text x="1152" y="369" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">CategoryRepository</text>
+<rect x="1135" y="393" width="6" height="6" rx="3" fill="#7A69C2" stroke="none" stroke-width="1"  />
+<text x="1152" y="406" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">MenuRepository</text>
+<rect x="1135" y="430" width="6" height="6" rx="3" fill="#7A69C2" stroke="none" stroke-width="1"  />
+<text x="1152" y="443" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">OrderRepository</text>
+<rect x="1135" y="467" width="6" height="6" rx="3" fill="#7A69C2" stroke="none" stroke-width="1"  />
+<text x="1152" y="480" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">OrderItemRepository</text>
+<rect x="1480" y="232" width="340" height="375" rx="16" fill="white" stroke="#DBE3ED" stroke-width="2" filter="url(#shadow)" />
+<rect x="1480" y="232" width="340" height="8" rx="4" fill="#20A18B" stroke="none" stroke-width="1"  />
+<text x="1505" y="283" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="23" font-weight="800" fill="#12223B">MySQL 8.0</text>
+<text x="1505" y="311" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="400" fill="#67778D">영속 데이터 저장</text>
+<path d="M1505,331 L1795,331" stroke="#E5EAF1" stroke-width="1" fill="none" stroke-linecap="round" />
+<rect x="1505" y="356" width="6" height="6" rx="3" fill="#20A18B" stroke="none" stroke-width="1"  />
+<text x="1522" y="369" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">category  ·  menu</text>
+<rect x="1505" y="393" width="6" height="6" rx="3" fill="#20A18B" stroke="none" stroke-width="1"  />
+<text x="1522" y="406" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">orders  ·  order_item</text>
+<rect x="1505" y="430" width="6" height="6" rx="3" fill="#20A18B" stroke="none" stroke-width="1"  />
+<text x="1522" y="443" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">JPA / Hibernate</text>
+<rect x="1505" y="467" width="6" height="6" rx="3" fill="#20A18B" stroke="none" stroke-width="1"  />
+<text x="1522" y="480" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#36485E">Docker Compose 지원</text>
+<path d="M310,425 L350,425" stroke="#7186A6" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrow)" />
+<text x="332.5" y="406" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#6A7A91">HTTP</text>
+<path d="M695,425 L730,425" stroke="#7186A6" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrow)" />
+<text x="715.0" y="406" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#6A7A91">호출</text>
+<path d="M1065,425 L1100,425" stroke="#7186A6" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrow)" />
+<text x="1085.0" y="406" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#6A7A91">조회/저장</text>
+<path d="M1435,425 L1470,425" stroke="#7186A6" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrow)" />
+<text x="1455.0" y="406" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#6A7A91">SQL</text>
+<rect x="360" y="681" width="330" height="219" rx="14" fill="#E9F3FD" stroke="#C7DCF5" stroke-width="1.5"  />
+<text x="383" y="721" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="21" font-weight="800" fill="#245A8B">API 문서 / 공통 처리</text>
+<path d="M383,739 L662,739" stroke="#C7DCF5" stroke-width="1" fill="none" stroke-linecap="round" />
+<text x="385" y="773" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#3F617E">• Springdoc OpenAPI · Swagger</text>
+<text x="385" y="802" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#3F617E">• Bean Validation · DTO</text>
+<text x="385" y="831" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#3F617E">• 예외 처리 핸들러</text>
+<text x="385" y="860" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="600" fill="#3F617E">• CORS 설정</text>
+<rect x="740" y="681" width="320" height="219" rx="14" fill="#F0F8FF" stroke="#BFD8F2" stroke-width="1.5"  />
+<text x="763" y="721" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="20" font-weight="800" fill="#225B8B">Redis 7  |  메뉴 조회 캐시</text>
+<path d="M763,739 L1035,739" stroke="#C7DCF5" stroke-width="1" fill="none" stroke-linecap="round" />
+<text x="766" y="773" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#3B5A76">• MenuService.all()</text>
+<text x="766" y="802" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#3B5A76">• @Cacheable / @CacheEvict</text>
+<text x="766" y="831" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#3B5A76">• TTL: 60초</text>
+<text x="766" y="860" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#3B5A76">• CACHE_ENABLED로 활성화 제어</text>
+<path d="M900,611 L900,672" stroke="#7186A6" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="9 7" marker-end="url(#arrow)" />
+<rect x="819" y="642" width="162" height="25" rx="5" fill="#F6F9FD" stroke="none" stroke-width="1"  />
+<text x="900" y="661" text-anchor="middle" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="14" font-weight="700" fill="#597596">캐시 사용 / 삭제</text>
+<rect x="1110" y="681" width="320" height="219" rx="14" fill="#F2F0FC" stroke="#D7D1F1" stroke-width="1.5"  />
+<text x="1133" y="721" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="21" font-weight="800" fill="#6050A5">데이터 처리 방식</text>
+<path d="M1133,739 L1404,739" stroke="#D7D1F1" stroke-width="1" fill="none" stroke-linecap="round" />
+<text x="1135" y="773" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#5B5487">• JPA Entity 4개</text>
+<text x="1135" y="802" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#5B5487">• JPA Auditing</text>
+<text x="1135" y="831" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#5B5487">• DTO 기반 API 응답</text>
+<text x="1135" y="860" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="16" font-weight="600" fill="#5B5487">• 영속 데이터는 MySQL에 저장</text>
+<path d="M65,938 L1835,938" stroke="#DDE5EE" stroke-width="2" fill="none" stroke-linecap="round" />
+<text x="65" y="974" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="500" fill="#52667F">* 논리 아키텍처: 배포 서버, 로드밸런서, 클라우드 인프라는 저장소 코드에서 확인되지 않아 표시하지 않았습니다.</text>
+<text x="65" y="1003" text-anchor="start" font-family="NanumSquare, Noto Sans CJK KR, sans-serif" font-size="17" font-weight="500" fill="#52667F">* 메뉴 전체 조회 캐시는 활성화된 환경에서만 동작합니다. 배송 묶음 API는 DeliveryBatchesController → OrderService 경로를 사용합니다.</text>
+</svg>

@@ -1,6 +1,8 @@
 package com.kdt.coffeprince.repository;
 
 import com.kdt.coffeprince.entity.Category;
+import com.kdt.coffeprince.exception.BusinessException;
+import com.kdt.coffeprince.exception.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,5 +31,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Modifying
     @Query("DELETE FROM Category c WHERE c.categoryId = :id")
     int deleteCategoryById(@Param("id") Long id);
+
+    default Category getOrThrow(Long categoryId) {
+        return findById(categoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
 }
 
