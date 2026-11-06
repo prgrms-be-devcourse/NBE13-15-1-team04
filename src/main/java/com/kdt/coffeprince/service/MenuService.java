@@ -24,6 +24,7 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
 
 
+    @Transactional(readOnly = true)
     public MenuResponse one(Long menuId) {
         Menu menu = menuRepository.getOrThrow(menuId);
         return MenuResponse.from(menu);
@@ -31,6 +32,7 @@ public class MenuService {
 
     // A06 캐시: Redis 키 "menus::all" 에 저장, TTL 동안 DB 재조회 안 함
     @Cacheable(cacheNames = RedisCacheConfig.MENUS, key = "'all'")
+    @Transactional(readOnly = true)
     public List<MenuResponse> all() {
         return menuRepository.findAllByOrderByMenuIdAsc()
                 .stream()
@@ -54,6 +56,7 @@ public class MenuService {
         return MenuResponse.from(menu);
     }
 
+    @Transactional(readOnly = true)
     public List<MenuResponse> available() {
         return menuRepository.findByIsAvailableTrueOrderByMenuIdAsc()
                 .stream()
