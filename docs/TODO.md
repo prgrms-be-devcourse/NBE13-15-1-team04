@@ -65,14 +65,14 @@
 
 ## 5. 보류 (코드 일관성 정리 후 진행)
 
-- [ ] **문자열 입력 trim 을 애노테이션으로 통일** — `CategoryRequest`·`CategoryUpdateRequest`·`CreateMenuRequest`·`PutMenuRequest`의
+- [ ] **문자열 입력 trim 을 애노테이션으로 통일** — `CategoryRequest`·`CategoryRequest`·`MenuRequest`·`MenuRequest`의
   컴팩트 생성자와 `CategoryService`·`OrderService`에 같은 `trim()` 로직이 흩어져 있음
     - 방안: `@Trimmed` 커스텀 애노테이션 (`@JacksonAnnotationsInside` + `@JsonDeserialize(using = TrimmedStringDeserializer.class)`)
       을 만들어 DTO 필드에 붙이고 생성자·서비스의 trim 제거. JSON 본문에만 적용되므로 쿼리 파라미터(`MenuSearchRequest`)는 별도
     - 검증 흐름은 그대로: trim 후 `@NotBlank`·`@Size` → `MethodArgumentNotValidException` → `ValidationExceptionHandler`
     - `{"name": 1}` 같은 자료형 오류는 현재 Jackson 이 `"1"` 로 변환해 통과시킴. 막으려면 역직렬화기에서 `VALUE_STRING` 토큰 검사
       추가 (전역은 `coercionConfigFor(LogicalType.Textual)` 설정). 널널하게 보기로 하여 당장은 적용 안 함
-    - `OrderService` 는 #52 에서 Reorder 와 통합됐고 요청 DTO 의 trim 은 `CreateOrderRequest` 컴팩트 생성자로 옮김.
+    - `OrderService` 는 #52 에서 Reorder 와 통합됐고 요청 DTO 의 trim 은 `OrderRequest` 컴팩트 생성자로 옮김.
       재주문·배송지 비교의 `trim()` 은 엔티티 값 대상이라 그대로 둠
 
 ## 6. Menu·Category·Order 리팩토링 후 전체 점검에서 발견한 것 (2026-11-06)
@@ -89,10 +89,10 @@
 - [x] `MenuSearchRequest`만 `@Size(max = 100)` 리터럴 → `Menu.MAX_NAME_LENGTH` 참조로 통일 (#44)
 - [ ] 읽기 트랜잭션: Order 조회는 전부 `@Transactional(readOnly = true)`인데 Menu는 `searchMenus()`만, Category는 없음.
   `Menu.category`가 LAZY라 응답에 카테고리 이름을 추가하는 순간 `open-in-view=false`에서 500 → 조회 메서드에 모두 붙일 것
-- [ ] 컨트롤러 주입 방식: `CategoryController`만 생성자 직접 작성, 나머지는 `@RequiredArgsConstructor`
+- [x] 컨트롤러 주입 방식: 전부 `@RequiredArgsConstructor` 로 통일
 - [x] 응답 방식: 모든 컨트롤러를 객체 직접 반환 + `@ResponseStatus` 로 통일 (#57)
-- [ ] 삭제 방식: Category는 `@Modifying @Query deleteCategoryById()`, Menu는 `repository.delete(entity)` → 한쪽으로 통일
-- [ ] 등록·수정 DTO 중복: `CategoryRequest`/`CategoryUpdateRequest`, `CreateMenuRequest`/`PutMenuRequest`가 내용이 같음.
+- [x] 삭제 방식: Category 도 `repository.delete(entity)` 로 통일, 커스텀 `deleteCategoryById` 제거
+- [x] 등록·수정 DTO 중복: `CategoryRequest`·`MenuRequest` 로 합치고 주문 요청은 `OrderRequest` 로 개명 (`<엔티티>Request` 규칙)
   의도적 분리가 아니면 하나로 합치기
 
 ### 남아 있는 잔재

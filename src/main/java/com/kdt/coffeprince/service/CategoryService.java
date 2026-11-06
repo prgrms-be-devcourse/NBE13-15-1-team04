@@ -2,7 +2,6 @@ package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.dto.CategoryResponse;
-import com.kdt.coffeprince.dto.CategoryUpdateRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.exception.BusinessException;
@@ -56,7 +55,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse update(Long categoryId, CategoryUpdateRequest request) {
+    public CategoryResponse update(Long categoryId, CategoryRequest request) {
         Category category = categoryRepository.getOrThrow(categoryId);
         String name = request.name();
 
@@ -77,6 +76,6 @@ public class CategoryService {
             throw new BusinessException(ErrorCode.CATEGORY_IN_USE);
         }
 
-        categoryRepository.deleteCategoryById(categoryId);
+        categoryRepository.delete(category);
     }
 }
