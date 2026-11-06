@@ -1,5 +1,13 @@
 @baseUrl = http://localhost:8080/api/v1
 
+# ---------------------------------------------------------------------------------------------------
+# 명세 7절 제출 사례 — 정상 24개(A01~A24 의 첫 번째 정상 요청) + 오류 6개(아래 [제출 ...] 표시)
+#   400 입력 오류 2개 : [제출 400-1] A08 name 공백 (필수 문자열)   [제출 400-2] A11 수량 21 (정수 범위)
+#   404 대상 없음 1개 : [제출 404-1] A07 존재하지 않는 메뉴
+#   409 업무 위반 3개 : [제출 409-1] A03 카테고리 이름 중복   [제출 409-2] A11 배송지 불일치   [제출 409-3] A10 주문에 사용된 메뉴 삭제
+# 나머지 실패 항목은 검증용 추가 사례입니다. 실행 순서는 파일 순서를 따르고, 준비 데이터와 변수는 각 항목 주석을 참고하세요.
+# ---------------------------------------------------------------------------------------------------
+
 ### A01 카테고리 목록
 GET {{baseUrl}}/categories
 
@@ -19,7 +27,7 @@ Content-Type: application/json
   "name": "new category"
 }
 
-### A03 카테고리 등록 실패 (중복 카테고리)
+### [제출 409-1] A03 카테고리 등록 실패 (중복 카테고리) — 기대: 409 CATEGORY_NAME_DUPLICATED, fieldErrors={}
 POST {{baseUrl}}/categories
 Content-Type: application/json
 
@@ -97,7 +105,7 @@ GET {{baseUrl}}/menus
 @searchMenuId=1
 GET {{baseUrl}}/menus/{{searchMenuId}}
 
-### A07 메뉴 상세 조회 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND
+### [제출 404-1] A07 메뉴 상세 조회 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND, fieldErrors={}
 @invalidMenuId=99999999
 GET {{baseUrl}}/menus/{{invalidMenuId}}
 
@@ -119,7 +127,7 @@ Content-Type: application/json
   "description": "블렌드 원두 패키지입니다."
 }
 
-### A08 메뉴 등록 실패 (name 공백) — 기대: 400 VALIDATION_ERROR, fieldErrors.name
+### [제출 400-1] A08 메뉴 등록 실패 (name 공백) — 기대: 400 VALIDATION_ERROR, fieldErrors.name
 POST {{baseUrl}}/menus
 Content-Type: application/json
 
@@ -376,7 +384,7 @@ Content-Type: application/json
   "items": []
 }
 
-### A11 주문 접수 실패 (수량 0) — 기대: 400 VALIDATION_ERROR, fieldErrors["items[0].quantity"] (1~20)
+### A11 주문 접수 실패 (수량 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.items (1~20)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -392,7 +400,7 @@ Content-Type: application/json
   ]
 }
 
-### A11 주문 접수 실패 (수량 21) — 기대: 400 VALIDATION_ERROR, fieldErrors["items[0].quantity"]
+### [제출 400-2] A11 주문 접수 실패 (수량 21) — 기대: 400 VALIDATION_ERROR, fieldErrors.items
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -444,7 +452,7 @@ Content-Type: application/json
   ]
 }
 
-### A11 주문 접수 실패 (menuId 자료형 오류) — 기대: 400 VALIDATION_ERROR, fieldErrors["items[0].menuId"]
+### A11 주문 접수 실패 (menuId 자료형 오류) — 기대: 400 VALIDATION_ERROR, fieldErrors.items
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -489,7 +497,7 @@ Content-Type: application/json
   ]
 }
 
-### A11 주문 접수 실패 (배송지 불일치) — 기대: 409 ADDRESS_MISMATCH, fieldErrors={}  (위 A11 접수 후 같은 이메일로 실행)
+### [제출 409-2] A11 주문 접수 실패 (배송지 불일치) — 기대: 409 ADDRESS_MISMATCH, fieldErrors={}  (위 A11 접수 후 같은 이메일로 실행)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -630,7 +638,7 @@ POST {{baseUrl}}/orders/{{invalidOrderId}}/cancel
 ### A16 주문 취소 실패 (주문 ID 타입) — 기대: 400 VALIDATION_ERROR, fieldErrors.orderId
 POST {{baseUrl}}/orders/{{orderIdWithInvalidType}}/cancel
 
-### A10 메뉴 삭제 실패 (주문에 사용된 메뉴) — 기대: 409 MENU_IN_USE, fieldErrors={}  ({{createdMenuId}} 는 위 A11 에서 주문에 사용됨)
+### [제출 409-3] A10 메뉴 삭제 실패 (주문에 사용된 메뉴) — 기대: 409 MENU_IN_USE, fieldErrors={}  ({{createdMenuId}} 는 위 A11 에서 주문에 사용됨)
 DELETE {{baseUrl}}/menus/{{createdMenuId}}
 
 ### A10 메뉴 삭제 — 준비: 주문에 쓰이지 않은 메뉴를 하나 등록하고 응답 id 를 @deleteMenuId 에 적을 것 (기대: 201)

@@ -98,6 +98,6 @@
 ### 남아 있는 잔재
 
 - [x] `MenuService`의 미사용 `NotFoundException` import 제거 (#44)
-- [ ] `NotFoundException`·`ApiError`·`ApiExceptionAdvice`는 더 이상 쓰는 곳이 없음 (Statistics 의 `BadRequestException` 도 #53 에서 제거) → #51 에서 삭제
-- [ ] `CategoryOrderExceptionHandler`(Order·DeliveryBatches 한정, 주석 처리된 `handleNotReadable` 포함) → #51에서 전역 핸들러로 흡수 후 삭제
+- [x] `NotFoundException`·`ApiError`·`ApiExceptionAdvice`는 더 이상 쓰는 곳이 없음 (Statistics 의 `BadRequestException` 도 #53 에서 제거) → #51 에서 삭제 (#51 삭제)
+- [x] `CategoryOrderExceptionHandler`(Order·DeliveryBatches 한정, 주석 처리된 `handleNotReadable` 포함) → #51에서 전역 핸들러로 흡수 후 삭제 (#51 `ValidationExceptionHandler` 로 흡수 후 삭제)
 - [x] 대소문자 구분을 쿼리 `COLLATE utf8mb4_bin` 대신 DB 콜레이션으로 통일 (docker-compose·init.sql·README, 네이티브 쿼리 → 파생 쿼리) (#44)
