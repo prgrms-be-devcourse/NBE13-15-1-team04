@@ -75,3 +75,29 @@
       추가 (전역은 `coercionConfigFor(LogicalType.Textual)` 설정). 널널하게 보기로 하여 당장은 적용 안 함
     - `OrderService` 는 #52 에서 Reorder 와 통합됐고 요청 DTO 의 trim 은 `OrderCreateRequest` 컴팩트 생성자로 옮김.
       재주문·배송지 비교의 `trim()` 은 엔티티 값 대상이라 그대로 둠
+
+## 6. Menu·Category·Order 리팩토링 후 전체 점검에서 발견한 것 (2026-11-06)
+
+### 명세와 다른 것
+
+- [ ] **A06·A19 메뉴 목록 정렬 없음** — `MenuService.all()`은 `findAll()`, `available()`은 `findByIsAvailableTrue()`로 `ORDER BY` 없이 조회.
+  명세는 ID 오름차순. Category(`findAllByOrderByCategoryIdAsc`)·A15(`OrderByMenuIdAsc`)처럼 정렬을 명시할 것
+- [ ] **A20 검색어의 `%`·`_` 가 LIKE 와일드카드로 동작** — `searchByNameExactCase`가 `LIKE CONCAT('%', :keyword, '%')`라
+  `50%` 검색이 "50 으로 시작하는 전부"에 매칭됨. 검색어를 이스케이프(`ESCAPE '\\'`)해서 "포함" 검색으로 맞출 것
+
+### 세 영역 사이의 일관성
+
+- [ ] `MenuSearchRequest`만 `@Size(max = 100)` 리터럴 → `Menu.MAX_NAME_LENGTH` 참조로 통일
+- [ ] 읽기 트랜잭션: Order 조회는 전부 `@Transactional(readOnly = true)`인데 Menu는 `searchMenus()`만, Category는 없음.
+  `Menu.category`가 LAZY라 응답에 카테고리 이름을 추가하는 순간 `open-in-view=false`에서 500 → 조회 메서드에 모두 붙일 것
+- [ ] 컨트롤러 주입 방식: `CategoryController`만 생성자 직접 작성, 나머지는 `@RequiredArgsConstructor`
+- [ ] 응답 방식: Category·Order는 `@ResponseStatus`, Menu는 `ResponseEntity` → 별도 이슈에서 프로젝트 단위로 통일
+- [ ] 삭제 방식: Category는 `@Modifying @Query deleteCategoryById()`, Menu는 `repository.delete(entity)` → 한쪽으로 통일
+- [ ] 등록·수정 DTO 중복: `CategoryRequest`/`CategoryUpdateRequest`, `CreateMenuRequest`/`PutMenuRequest`가 내용이 같음.
+  의도적 분리가 아니면 하나로 합치기
+
+### 남아 있는 잔재
+
+- [ ] `MenuService`의 미사용 `NotFoundException` import 제거
+- [ ] `NotFoundException`·`ApiError`·`ApiExceptionAdvice`는 Statistics의 `BadRequestException` 처리에만 남음 → #51·#53에서 삭제
+- [ ] `CategoryOrderExceptionHandler`(Order·DeliveryBatches 한정, 주석 처리된 `handleNotReadable` 포함) → #51에서 전역 핸들러로 흡수 후 삭제
