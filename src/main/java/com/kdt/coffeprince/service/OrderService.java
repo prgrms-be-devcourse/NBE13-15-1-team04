@@ -17,17 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -137,10 +129,7 @@ public class OrderService {
     // ---------- A12 이메일별 주문 ----------
     @Transactional(readOnly = true)
     public List<OrderSummaryResponse> findByCustomerEmail(String email) {
-        if (email == null || email.isBlank()) {
-            throw new BusinessException(ErrorCode.VALIDATION_ERROR, Map.of("email", "이메일은 필수입니다."));
-        }
-        return orderRepository.findByCustomerEmailOrderByOrderedAtDescOrderIdDesc(email.trim()).stream()
+        return orderRepository.findByCustomerEmailOrderByOrderedAtDescOrderIdDesc(email).stream()
                 .map(OrderSummaryResponse::from)
                 .toList();
     }

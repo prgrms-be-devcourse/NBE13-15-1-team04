@@ -25,6 +25,7 @@ public class Order {
     public static final int MAX_EMAIL_LENGTH = 100;
     public static final int MAX_ADDRESS_LENGTH = 200;
     public static final int MAX_ITEM_SIZE = 10;
+    public static final int MAX_MEMO_LENGTH = 200;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +53,7 @@ public class Order {
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;
 
-    @Column
+    @Column(length = MAX_MEMO_LENGTH)
     private String memo;
 
     @Enumerated(EnumType.STRING)

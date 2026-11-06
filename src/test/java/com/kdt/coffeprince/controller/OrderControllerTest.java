@@ -84,7 +84,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
-                .andExpect(jsonPath("$.fieldErrors.memo").value("메모는 문자열로 입력해 주세요."));
+                .andExpect(jsonPath("$.fieldErrors.memo").value("문자열로 입력해 주세요."));
 
         verify(orderService, never()).changeMemo(anyLong(), anyString());
     }
@@ -97,7 +97,22 @@ class OrderControllerTest {
                         .content("{}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.fieldErrors.memo").exists());
+                .andExpect(jsonPath("$.fieldErrors.memo").value("필수 값입니다."));
+
+        verify(orderService, never()).changeMemo(anyLong(), anyString());
+    }
+
+    @Test
+    @DisplayName("A22: 메모가 null 이면 400 VALIDATION_ERROR와 fieldErrors.memo를 반환한다")
+    void 메모가_null이면_400을_반환한다() throws Exception {
+        mockMvc.perform(put("/api/v1/orders/1/memo")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"memo": null}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.fieldErrors.memo").value("필수 값입니다."));
 
         verify(orderService, never()).changeMemo(anyLong(), anyString());
     }
@@ -112,7 +127,7 @@ class OrderControllerTest {
                         .content("{\"memo\": \"" + memo201 + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.fieldErrors.memo").value("메모는 200자 이하로 입력해 주세요."));
+                .andExpect(jsonPath("$.fieldErrors.memo").value("200자 이하로 입력해 주세요."));
 
         verify(orderService, never()).changeMemo(anyLong(), anyString());
     }

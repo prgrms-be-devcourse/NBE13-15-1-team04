@@ -313,7 +313,6 @@ Content-Type: application/json
 
 
 ### A11 주문 접수 (기대: 201, totalAmount=17000, status=PLACED, cancelledAt=null, memo="" / 응답 id 를 @orderId 에 적을 것)
-### TODO: 명세 요청 필드는 email·address 인데 구현은 customerEmail·deliveryAddress 를 받음 (명세대로 보내면 400)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -366,7 +365,6 @@ Content-Type: application/json
 }
 
 ### A11 주문 접수 실패 (이메일 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.email
-### TODO: fieldErrors 키가 명세의 email 이 아니라 customerEmail 로 나옴
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -393,8 +391,7 @@ Content-Type: application/json
   "items": []
 }
 
-### A11 주문 접수 실패 (수량 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.items
-### TODO: 명세의 수량 상한 20·항목 최대 10개·menuId 중복 금지·우편번호 숫자 5자리·주소 200자 검사가 없음
+### A11 주문 접수 실패 (수량 0) — 기대: 400 VALIDATION_ERROR, fieldErrors["items[0].quantity"] (1~20)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -410,16 +407,88 @@ Content-Type: application/json
   ]
 }
 
+### A11 주문 접수 실패 (수량 21) — 기대: 400 VALIDATION_ERROR, fieldErrors["items[0].quantity"]
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
+  "postcode": "01234",
+  "items": [
+    {
+      "menuId": 1,
+      "quantity": 21
+    }
+  ]
+}
+
+### A11 주문 접수 실패 (menuId 중복) — 기대: 400 VALIDATION_ERROR, fieldErrors.items
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
+  "postcode": "01234",
+  "items": [
+    {
+      "menuId": 1,
+      "quantity": 1
+    },
+    {
+      "menuId": 1,
+      "quantity": 2
+    }
+  ]
+}
+
+### A11 주문 접수 실패 (우편번호 4자리) — 기대: 400 VALIDATION_ERROR, fieldErrors.postcode
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
+  "postcode": "1234",
+  "items": [
+    {
+      "menuId": 1,
+      "quantity": 1
+    }
+  ]
+}
+
+### A11 주문 접수 실패 (menuId 자료형 오류) — 기대: 400 VALIDATION_ERROR, fieldErrors["items[0].menuId"]
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "email": "buyer@example.com",
+  "address": "서울시 실습로 10 101호",
+  "postcode": "01234",
+  "items": [
+    {
+      "menuId": "a",
+      "quantity": 1
+    }
+  ]
+}
+
 ### A11 주문 접수 실패 (JSON 문법 오류) — 기대: 400 VALIDATION_ERROR, fieldErrors={}
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
 {
-  "email": "buyer@example.com"
+  "email": "buyer@example.com",
+  "items": [
+    {
+      "menuId": 1,
+    }
+  ]
 }
 
 ### A11 주문 접수 실패 (존재하지 않는 메뉴) — 기대: 404 MENU_NOT_FOUND, fieldErrors={}
-### TODO: 상태는 404 이지만 본문이 Spring 기본 형식 {timestamp,status,error,path} (OrderService.place 가 ResponseStatusException 을 던짐)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -436,7 +505,6 @@ Content-Type: application/json
 }
 
 ### A11 주문 접수 실패 (배송지 불일치) — 기대: 409 ADDRESS_MISMATCH, fieldErrors={}  (위 A11 접수 후 같은 이메일로 실행)
-### TODO: 상태는 409 이지만 본문이 Spring 기본 형식 (ResponseStatusException)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -454,7 +522,6 @@ Content-Type: application/json
 
 ### A11 주문 접수 실패 (판매 중지 메뉴) — 기대: 409 MENU_UNAVAILABLE, fieldErrors={}
 ### 준비: 먼저 A21 로 {{createdMenuId}} 를 available=false 로 바꾼 뒤 실행
-### TODO: 상태는 409 이지만 본문이 Spring 기본 형식 (ResponseStatusException)
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -471,24 +538,22 @@ Content-Type: application/json
 }
 
 ### A12 이메일별 주문 (기대: 200, OrderSummary[] 접수 시각 내림차순, 취소 주문 포함)
-### TODO: 명세 쿼리 이름은 email 인데 구현은 customerEmail. 응답 필드도 명세의 id·createdAt·shippingDate 가 아니라 orderId·orderedAt·deliveryDate 로 나옴
-GET {{baseUrl}}/orders?customerEmail=buyer%40example.com
+GET {{baseUrl}}/orders?email=buyer%40example.com
 
 ### A12 이메일별 주문 (주문 없는 이메일) — 기대: 200 + []
-GET {{baseUrl}}/orders?customerEmail=nobody%40example.com
+GET {{baseUrl}}/orders?email=nobody%40example.com
 
 ### A12 이메일별 주문 실패 (이메일 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.email
-### TODO: 상태는 400 이지만 본문이 Spring 기본 형식 (ResponseStatusException)
 GET {{baseUrl}}/orders
+
+### A12 이메일별 주문 실패 (이메일 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.email
+GET {{baseUrl}}/orders?email=not-an-email
 
 ### A13 주문 상세 (기대: 200, 전체 Order — items 의 menuName·unitPrice 는 접수 당시 값)
 @orderId=6
 GET {{baseUrl}}/orders/{{orderId}}
 
-### TODO: 존재하는 주문인데 500 에러 발생 중 (OrderService.find 에 @Transactional 이 없고 open-in-view=false 라 items 지연 로딩 실패로 추정)
-
 ### A13 주문 상세 실패 (존재하지 않는 주문) — 기대: 404 ORDER_NOT_FOUND, fieldErrors={}
-### TODO: 상태는 404 이지만 본문이 Spring 기본 형식 (ResponseStatusException)
 @invalidOrderId=99999999
 GET {{baseUrl}}/orders/{{invalidOrderId}}
 
@@ -497,7 +562,6 @@ GET {{baseUrl}}/orders/{{invalidOrderId}}
 GET {{baseUrl}}/orders/{{orderIdWithInvalidType}}
 
 ### A13 주문 상세 실패 (주문 ID 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.orderId
-### TODO: 404 가 나옴 (get 에 @Positive 가 없어 조회까지 감)
 GET {{baseUrl}}/orders/0
 
 ### A22 주문 메모 수정 (기대: 200, memo 만 바뀐 전체 Order)

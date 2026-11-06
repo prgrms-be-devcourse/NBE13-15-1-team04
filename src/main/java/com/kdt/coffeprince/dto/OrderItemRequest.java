@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.dto;
 
+import com.kdt.coffeprince.entity.OrderItem;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.hibernate.validator.constraints.Range;
@@ -13,11 +14,9 @@ public record OrderItemRequest(
         Long menuId,
 
         @NotNull
-        @Range(min = 1, max = MAX_ITEM_QUANTITY)
+        @Range(min = 1, max = OrderItem.MAX_QUANTITY)
         Integer quantity
 ) {
-    private static final int MAX_ITEM_QUANTITY = 20;
-
     // 주문 항목은 메뉴 ID 로 식별한다 (@UniqueElements 의 menuId 중복 검사용, 수량은 비교하지 않음)
     @Override
     public boolean equals(Object o) {
