@@ -676,10 +676,9 @@ DELETE {{baseUrl}}/menus/{{invalidMenuId}}
 DELETE {{baseUrl}}/menus/{{searchMenuIdWithInvalidType}}
 
 ### A14 배송 묶음 (기대: 200, 이메일순 DeliveryBatch[] / orderIds 오름차순, 같은 메뉴 수량 합산)
-### TODO: 명세 쿼리 이름은 shippingDate 인데 구현은 deliveryDate
 ### TODO: PLACED 주문이 있는 날짜로 조회하면 500 에러 발생 중 (findDeliveryBatches 에 @Transactional 이 없어 items 지연 로딩 실패로 추정) / 주문 없는 날짜는 200 + []
-@shippingDate=2026-11-05
-GET {{baseUrl}}/delivery-batches?deliveryDate={{shippingDate}}
+@deliveryDate=2026-11-05
+GET {{baseUrl}}/delivery-batches?deliveryDate={{deliveryDate}}
 
 ### A14 배송 묶음 (주문 없는 날짜) — 기대: 200 + []
 GET {{baseUrl}}/delivery-batches?deliveryDate=2026-01-01

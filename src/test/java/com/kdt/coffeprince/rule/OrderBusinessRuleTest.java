@@ -1,11 +1,11 @@
 package com.kdt.coffeprince.rule;
 
 import com.kdt.coffeprince.dto.OrderCreateRequest;
+import com.kdt.coffeprince.dto.OrderItemRequest;
 import com.kdt.coffeprince.dto.OrderResponse;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.service.OrderService;
-import com.kdt.coffeprince.service.ReorderService;
 import com.kdt.coffeprince.support.MutableClock;
 import com.kdt.coffeprince.support.TestClockConfig;
 import jakarta.persistence.EntityManager;
@@ -42,9 +42,6 @@ class OrderBusinessRuleTest {
     OrderService orderService;
 
     @Autowired
-    ReorderService reorderService;
-
-    @Autowired
     MutableClock clock;
 
     @Autowired
@@ -61,7 +58,7 @@ class OrderBusinessRuleTest {
         clock.set(year, mon, day, hour, min, sec);
         return orderService.place(new OrderCreateRequest(
                 email, ADDRESS, POSTCODE,
-                List.of(new OrderCreateRequest.Item(MENU_ID, qty))));
+                List.of(new OrderItemRequest(MENU_ID, qty))));
     }
 
     private static void assertErrorCode(Runnable call, ErrorCode expected) {
@@ -192,7 +189,7 @@ class OrderBusinessRuleTest {
             entityManager.clear();
 
             clock.set(2030, 5, 10, 11, 0, 0);
-            OrderResponse reorder = reorderService.reorder(original.id());
+            OrderResponse reorder = orderService.reorder(original.id());
 
             // 새 주문은 현재 가격
             assertThat(reorder.id()).isNotEqualTo(original.id());

@@ -76,10 +76,10 @@ public class OrderService {
 
         // 접수 시각 기준으로 배송일 계산 (재주문은 처리 시각 기준으로 다시 계산)
         Instant orderedAt = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
-        LocalDate shippingDate = calculateDeliveryDate(orderedAt);
-        validateSameAddress(email, shippingDate, address, postcode);
+        LocalDate deliveryDate = calculateDeliveryDate(orderedAt);
+        validateSameAddress(email, deliveryDate, address, postcode);
 
-        Order order = Order.place(email, address, postcode, orderedAt, shippingDate, reorderSource);
+        Order order = Order.place(email, address, postcode, orderedAt, deliveryDate, reorderSource);
         for (Line line : lines) {
             order.addItem(new OrderItem(menus.get(line.menuId()), line.quantity()));
         }
@@ -105,11 +105,16 @@ public class OrderService {
         return menus;
     }
 
-        Instant orderedAt = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
-        LocalDate deliveryDate = calculateDeliveryDate(orderedAt);
+    // 서울 14:00:00 전이면 당일, 정각부터는 다음 날 (연말이면 다음 해로 넘어감)
+    private LocalDate calculateDeliveryDate(Instant orderedAt) {
+        ZonedDateTime seoul = orderedAt.atZone(DateUtils.ZONE);
+        return seoul.toLocalTime().isBefore(CUTOFF)
+                ? seoul.toLocalDate()
+                : seoul.toLocalDate().plusDays(1);
+    }
 
     // 같은 이메일·배송일의 PLACED 주문과 주소·우편번호가 다르면 409
-    private void validateSameAddress(String email, LocalDate shippingDate, String address, String postcode) {
+    private void validateSameAddress(String email, LocalDate deliveryDate, String address, String postcode) {
         boolean mismatch = orderRepository
                 .findByCustomerEmailAndDeliveryDateAndStatus(email, deliveryDate, OrderStatus.PLACED)
                 .stream()
@@ -118,22 +123,6 @@ public class OrderService {
         if (mismatch) {
             throw new BusinessException(ErrorCode.ADDRESS_MISMATCH);
         }
-
-        // 주문 + 항목 저장 (한 트랜잭션, cascade)
-        Order order = Order.place(email, address, postcode, orderedAt, deliveryDate, null);
-        for (OrderItem item : request.items()) {
-            Menu menu = menus.get(item.menuId());
-            order.addItem(new OrderItem(menu, item.quantity()));
-        }
-        return OrderResponse.from(orderRepository.save(order));
-    }
-
-    // 서울 14:00:00 전이면 당일, 정각부터는 다음 날
-    private LocalDate calculateDeliveryDate(Instant orderedAt) {
-        ZonedDateTime seoul = orderedAt.atZone(DateUtils.ZONE);
-        return seoul.toLocalTime().isBefore(CUTOFF)
-                ? seoul.toLocalDate()
-                : seoul.toLocalDate().plusDays(1);
     }
 
     // ---------- A12 이메일별 주문 ----------
