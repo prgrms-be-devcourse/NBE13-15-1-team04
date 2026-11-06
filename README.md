@@ -75,7 +75,7 @@ MySQL에 주문과 상품 데이터를 저장하며, 반복적으로 요청되�
 | 주문 | PUT | `/orders/{orderId}/memo` | 주문 메모 수정 |
 | 주문 | POST | `/orders/{orderId}/cancel` | 주문 취소 |
 | 주문 | POST | `/orders/{orderId}/reorder` | 기존 주문 기반 재주문 |
-| 배송 | GET | `/delivery-batches?deliveryDate={date}` | 배송일별 주문 묶음 조회 |
+| 배송 | GET | `/delivery-batches?shippingDate={date}` | 배송일별 주문 묶음 조회 |
 | 통계 | GET | `/statistics/orders?date={date}` | 주문 통계 |
 | 통계 | GET | `/statistics/menus?date={date}` | 메뉴 통계 |
 | 통계 | GET | `/statistics/customers?date={date}` | 고객 통계 |
@@ -120,6 +120,13 @@ Content-Type: application/json
 
 관련 코드: [OrderService.java](./src/main/java/com/kdt/coffeprince/service/OrderService.java), [Order.java](./src/main/java/com/kdt/coffeprince/entity/Order.java)
 
+#### 시각 경계값 확인 방법 (13:59:59 / 14:00:00)
+
+PC·서버 시계를 바꾸지 않고 확인합니다. 운영 코드는 `Clock` 빈(`ClockConfig`)으로 "지금 시각"을 읽고, 접수 시각을 한 번 읽어 배송일 계산과 `createdAt` 저장에 그대로 사용합니다. 테스트에서는 `TestClockConfig`가 `MutableClock`을 `@Primary`로 바꿔 끼워 `clock.set(년, 월, 일, 시, 분, 초)`로 서울 시각을 고정합니다.
+
+- [`OrderBusinessRuleTest`](./src/test/java/com/kdt/coffeprince/rule/OrderBusinessRuleTest.java): 실제 MySQL에 주문을 넣어 13:59:59 → 당일, 14:00:00·14:00:01 → 다음 날, 12월 31일 → 다음 해 배송일과 취소 마감·재취소·재주문을 검증합니다. 고정한 접수 시각이 응답 `createdAt`과 배송일에 함께 반영되는지도 확인합니다. `db/init.sql`의 메뉴 1번을 사용하고 클래스 전체가 `@Transactional`이라 데이터는 남지 않습니다.
+- [`OrderCancelDeadlineTest`](./src/test/java/com/kdt/coffeprince/entity/OrderCancelDeadlineTest.java): DB 없이 `Order.isCancellableAt(Instant)`에 13:59:59와 14:00:00을 직접 넣어 취소 마감을 확인합니다.
+
 ### 3. 주문 당시 메뉴 정보 보존
 
 `OrderItem` 생성 시점의 **메뉴명·단가·수량·금액**을 별도 필드에 저장합니다. 이후 메뉴 가격이나 이름이 변경되어도 기존 주문에 기록된 값은 유지됩니다.
@@ -135,6 +142,13 @@ Content-Type: application/json
 - **이력 보존:** 취소 시 주문 상태와 취소 시각을 변경하고, 주문 항목·금액은 그대로 둡니다.
 
 관련 코드: [OrderService.java](./src/main/java/com/kdt/coffeprince/service/OrderService.java), [Order.java](./src/main/java/com/kdt/coffeprince/entity/Order.java)
+
+#### 시각 경계값 확인 방법 (13:59:59 / 14:00:00)
+
+PC·서버 시계를 바꾸지 않고 확인합니다. 운영 코드는 `Clock` 빈(`ClockConfig`)으로 "지금 시각"을 읽고, 접수 시각을 한 번 읽어 배송일 계산과 `createdAt` 저장에 그대로 사용합니다. 테스트에서는 `TestClockConfig`가 `MutableClock`을 `@Primary`로 바꿔 끼워 `clock.set(년, 월, 일, 시, 분, 초)`로 서울 시각을 고정합니다.
+
+- [`OrderBusinessRuleTest`](./src/test/java/com/kdt/coffeprince/rule/OrderBusinessRuleTest.java): 실제 MySQL에 주문을 넣어 13:59:59 → 당일, 14:00:00·14:00:01 → 다음 날, 12월 31일 → 다음 해 배송일과 취소 마감·재취소·재주문을 검증합니다. 고정한 접수 시각이 응답 `createdAt`과 배송일에 함께 반영되는지도 확인합니다. `db/init.sql`의 메뉴 1번을 사용하고 클래스 전체가 `@Transactional`이라 데이터는 남지 않습니다.
+- [`OrderCancelDeadlineTest`](./src/test/java/com/kdt/coffeprince/entity/OrderCancelDeadlineTest.java): DB 없이 `Order.isCancellableAt(Instant)`에 13:59:59와 14:00:00을 직접 넣어 취소 마감을 확인합니다.
 
 ## 🚀 로컬 실행 방법
 
@@ -257,6 +271,12 @@ docker exec coffeprince-redis redis-cli TTL 'menus::all'
 
 # RestClient 외부 게시글 API 테스트
 ./gradlew test --tests "*ReferencePostControllerTest"
+
+# 14:00 경계값 (배송일 계산·취소 마감) — MySQL 실행 필요
+./gradlew test --tests "*OrderBusinessRuleTest"
+
+# 취소 마감 경계값 (DB 없이 실행)
+./gradlew test --tests "*OrderCancelDeadlineTest"
 ```
 
 Windows PowerShell에서는 위 명령어의 `./gradlew` 대신 `.\gradlew.bat`을 사용합니다.

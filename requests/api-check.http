@@ -234,16 +234,16 @@ GET {{baseUrl}}/categories/{{invalidCategoryId}}/menus
 GET {{baseUrl}}/menus/available
 
 ### A20 메뉴명 검색 (기대: 200, "Columbia" 가 들어간 메뉴 1·3)
-GET {{baseUrl}}/menus/search?name=Columbia
+GET {{baseUrl}}/menus/search?keyword=Columbia
 
 ### A20 메뉴명 검색 (결과 없음) — 기대: 200 + []
-GET {{baseUrl}}/menus/search?name=NoSuchMenu
+GET {{baseUrl}}/menus/search?keyword=NoSuchMenu
 
 ### A20 메뉴명 검색 실패 (검색어 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.keyword
 GET {{baseUrl}}/menus/search
 
 ### A20 메뉴명 검색 실패 (검색어 공백) — 기대: 400 VALIDATION_ERROR (앞뒤 공백 제거 후 1~100자)
-GET {{baseUrl}}/menus/search?name=
+GET {{baseUrl}}/menus/search?keyword=
 
 
 
@@ -679,13 +679,13 @@ GET {{baseUrl}}/delivery-batches?shippingDate=2026-13-45
 @statDate=2026-11-04
 GET {{baseUrl}}/statistics/orders?date={{statDate}}
 
-### A17 접수일별 주문 통계 (date 생략 → 오늘)
+### A17 접수일별 주문 통계 실패 (date 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.date
 GET {{baseUrl}}/statistics/orders
 
 ### A17 접수일별 주문 통계 (주문 없는 날짜) — 기대: 200, 모든 값 0 인 객체
 GET {{baseUrl}}/statistics/orders?date=2026-01-01
 
-### A17 접수일별 주문 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR, fieldErrors.date
+### A17 접수일별 주문 통계 (미래 날짜) — 기대: 200, 주문 없는 날과 같은 모든 값 0 인 객체 (명세 범위 2000~2099 안이면 정상 조회)
 GET {{baseUrl}}/statistics/orders?date=2099-01-01
 
 ### A17 접수일별 주문 통계 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.date
@@ -697,7 +697,7 @@ GET {{baseUrl}}/statistics/menus?date={{statDate}}
 ### A18 접수일별 메뉴 통계 (주문 없는 날짜) — 기대: 200 + []
 GET {{baseUrl}}/statistics/menus?date=2026-01-01
 
-### A18 접수일별 메뉴 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR
+### A18 접수일별 메뉴 통계 (미래 날짜) — 기대: 200 + []
 GET {{baseUrl}}/statistics/menus?date=2099-01-01
 
 ### A24 접수일별 고객 통계 (기대: 200, CustomerStatistics[] 이메일 오름차순, 전부 취소한 고객도 포함)
@@ -706,7 +706,7 @@ GET {{baseUrl}}/statistics/customers?date={{statDate}}
 ### A24 접수일별 고객 통계 (주문 없는 날짜) — 기대: 200 + []
 GET {{baseUrl}}/statistics/customers?date=2026-01-01
 
-### A24 접수일별 고객 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR
+### A24 접수일별 고객 통계 (미래 날짜) — 기대: 200 + []
 GET {{baseUrl}}/statistics/customers?date=2099-01-01
 
 # ---------------------------------------------------------------------------------------------------

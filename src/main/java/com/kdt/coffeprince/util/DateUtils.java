@@ -14,17 +14,6 @@ public class DateUtils {
         return LocalDate.now(ZONE);
     }
 
-    public static LocalDate getOrDefault(LocalDate date) {
-        return (date == null) ? today() : date;
-    }
-
-    /**
-     * 내일 이후의 날짜인지 반환한다. 오늘은 false.
-     */
-    public static boolean isFuture(LocalDate date) {
-        return date.isAfter(today());
-    }
-
     public static Instant startOf(LocalDate date) {
         return date.atStartOfDay(ZONE).toInstant();
     }

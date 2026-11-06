@@ -3,10 +3,7 @@ package com.kdt.coffeprince.controller;
 import com.kdt.coffeprince.dto.CustomerStatistics;
 import com.kdt.coffeprince.dto.MenuStatistics;
 import com.kdt.coffeprince.dto.OrderStatistics;
-import com.kdt.coffeprince.exception.BusinessException;
-import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.service.StatisticsService;
-import com.kdt.coffeprince.util.DateUtils;
 import com.kdt.coffeprince.validation.UrlDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/statistics")
@@ -26,7 +22,7 @@ public class StatisticsController {
 
     @GetMapping("/orders")                                 // A17
     public OrderStatistics getOrderStatistics(
-            @RequestParam(value = "date", required = false) @UrlDate String date
+            @RequestParam @UrlDate String date
     ) {
         LocalDate targetDate = resolveTargetDate(date);
         return statisticsService.getOrderStatisticsByDate(targetDate);
@@ -34,7 +30,7 @@ public class StatisticsController {
 
     @GetMapping("/menus")                                  // A18
     public List<MenuStatistics> getMenuStatistics(
-            @RequestParam(value = "date", required = false) @UrlDate String date
+            @RequestParam @UrlDate String date
     ) {
         LocalDate targetDate = resolveTargetDate(date);
         return statisticsService.getMenuStatisticsByDate(targetDate);
@@ -42,21 +38,15 @@ public class StatisticsController {
 
     @GetMapping("/customers")                              // A24
     public List<CustomerStatistics> getCustomerStatistics(
-            @RequestParam(value = "date", required = false) @UrlDate String date
+            @RequestParam @UrlDate String date
     ) {
         LocalDate targetDate = resolveTargetDate(date);
         return statisticsService.getCustomerStatisticsByDate(targetDate);
     }
 
-    // 날짜가 없으면 오늘. @UrlDate 를 통과한 값이라 parse 는 실패하지 않는다. 미래 날짜는 400 (세 통계 공통)
+    // date 는 필수(누락 400)이며 @UrlDate 가 형식·실제 날짜·2000~2099 범위를 검사하므로 parse 는 실패하지 않는다.
+    // 미래 날짜도 명세 범위 안이면 정상 조회한다 (주문이 없으면 0 객체·빈 배열)
     private static LocalDate resolveTargetDate(String date) {
-        if (date == null) {
-            return DateUtils.today();
-        }
-        LocalDate target = LocalDate.parse(date);
-        if (DateUtils.isFuture(target)) {
-            throw new BusinessException(ErrorCode.VALIDATION_ERROR, Map.of("date", "오늘 또는 그 이전 날짜여야 합니다."));
-        }
-        return target;
+        return LocalDate.parse(date);
     }
 }

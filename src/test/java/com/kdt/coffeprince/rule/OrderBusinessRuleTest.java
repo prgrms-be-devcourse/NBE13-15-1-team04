@@ -104,6 +104,15 @@ class OrderBusinessRuleTest {
 
             assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2031, 1, 1).toString());
         }
+
+        @Test
+        @DisplayName("응답 createdAt 은 저장 시점이 아니라 배송일 계산에 쓴 접수 시각 그대로다")
+        void createdAtUsesRequestInstant() {
+            OrderResponse order = placeAt(2030, 5, 10, 13, 59, 59, "rule-dayTest5@test.com", 1);
+
+            assertThat(order.createdAt()).isEqualTo("2030-05-10T13:59:59+09:00");
+            assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2030, 5, 10).toString());
+        }
     }
 
     // ===================================================== 2. 주문 취소
