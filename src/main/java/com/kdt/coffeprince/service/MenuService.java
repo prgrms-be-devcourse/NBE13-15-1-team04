@@ -1,9 +1,8 @@
 package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.config.RedisCacheConfig;
-import com.kdt.coffeprince.dto.CreateMenuRequest;
+import com.kdt.coffeprince.dto.MenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
-import com.kdt.coffeprince.dto.PutMenuRequest;
 import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.entity.Menu;
 import com.kdt.coffeprince.exception.BusinessException;
@@ -41,7 +40,7 @@ public class MenuService {
 
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
-    public MenuResponse updateMenu(Long menuId, PutMenuRequest body) {
+    public MenuResponse updateMenu(Long menuId, MenuRequest body) {
         Menu menu = menuRepository.getOrThrow(menuId);
         Category category = categoryRepository.getOrThrow(body.categoryId());
 
@@ -73,7 +72,7 @@ public class MenuService {
 
     @CacheEvict(cacheNames = RedisCacheConfig.MENUS, allEntries = true)
     @Transactional
-    public MenuResponse createMenu(CreateMenuRequest body) {
+    public MenuResponse createMenu(MenuRequest body) {
         Category category = this.categoryRepository.getOrThrow(body.categoryId());
 
         Menu menu = new Menu(

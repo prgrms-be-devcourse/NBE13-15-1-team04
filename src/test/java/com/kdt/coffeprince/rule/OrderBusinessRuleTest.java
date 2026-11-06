@@ -1,6 +1,6 @@
 package com.kdt.coffeprince.rule;
 
-import com.kdt.coffeprince.dto.CreateOrderRequest;
+import com.kdt.coffeprince.dto.OrderRequest;
 import com.kdt.coffeprince.dto.OrderItemRequest;
 import com.kdt.coffeprince.dto.OrderResponse;
 import com.kdt.coffeprince.exception.BusinessException;
@@ -56,7 +56,7 @@ class OrderBusinessRuleTest {
     private OrderResponse placeAt(int year, int mon, int day, int hour, int min, int sec,
                                   String email, int qty) {
         clock.set(year, mon, day, hour, min, sec);
-        return orderService.place(new CreateOrderRequest(
+        return orderService.place(new OrderRequest(
                 email, ADDRESS, POSTCODE,
                 List.of(new OrderItemRequest(MENU_ID, qty))));
     }

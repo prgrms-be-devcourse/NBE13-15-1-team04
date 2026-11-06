@@ -1,6 +1,6 @@
 package com.kdt.coffeprince.controller;
 
-import com.kdt.coffeprince.dto.CategoryUpdateRequest;
+import com.kdt.coffeprince.dto.CategoryRequest;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.service.CategoryService;
@@ -50,7 +50,7 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
                 .andExpect(jsonPath("$.fieldErrors.name").exists());
 
-        verify(categoryService, never()).update(anyLong(), any(CategoryUpdateRequest.class));
+        verify(categoryService, never()).update(anyLong(), any(CategoryRequest.class));
     }
 
     @Test
@@ -65,7 +65,7 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.fieldErrors.name").exists());
 
-        verify(categoryService, never()).update(anyLong(), any(CategoryUpdateRequest.class));
+        verify(categoryService, never()).update(anyLong(), any(CategoryRequest.class));
     }
 
     @Test
@@ -80,13 +80,13 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.fieldErrors.categoryId").exists());
 
-        verify(categoryService, never()).update(anyLong(), any(CategoryUpdateRequest.class));
+        verify(categoryService, never()).update(anyLong(), any(CategoryRequest.class));
     }
 
     @Test
     @DisplayName("A04: 없는 카테고리를 수정하면 404 CATEGORY_NOT_FOUND를 반환한다")
     void 없는_카테고리를_수정하면_404를_반환한다() throws Exception {
-        when(categoryService.update(eq(999L), any(CategoryUpdateRequest.class)))
+        when(categoryService.update(eq(999L), any(CategoryRequest.class)))
                 .thenThrow(new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
 
         mockMvc.perform(put("/api/v1/categories/999")
@@ -103,7 +103,7 @@ class CategoryControllerTest {
     @Test
     @DisplayName("A04: 다른 카테고리와 이름이 같으면 409 CATEGORY_NAME_DUPLICATED를 반환한다")
     void 이미_있는_카테고리명으로_수정하면_409를_반환한다() throws Exception {
-        when(categoryService.update(eq(2L), any(CategoryUpdateRequest.class)))
+        when(categoryService.update(eq(2L), any(CategoryRequest.class)))
                 .thenThrow(new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED));
 
         mockMvc.perform(put("/api/v1/categories/2")
