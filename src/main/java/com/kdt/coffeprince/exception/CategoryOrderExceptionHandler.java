@@ -2,14 +2,12 @@ package com.kdt.coffeprince.exception;
 
 import com.kdt.coffeprince.controller.DeliveryBatchesController;
 import com.kdt.coffeprince.controller.OrderController;
-import com.kdt.coffeprince.controller.ReorderController;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterErrors;
 import org.springframework.validation.method.ParameterValidationResult;
@@ -28,7 +26,7 @@ import java.util.Map;
 // 직접 던지는 BusinessException은 BusinessExceptionHandler가 처리한다
 // 팀 공통 틀이 정해지면 ApiExceptionAdvice와 합칠 예정
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(assignableTypes = {OrderController.class, ReorderController.class,
+@RestControllerAdvice(assignableTypes = {OrderController.class,
         DeliveryBatchesController.class})
 public class CategoryOrderExceptionHandler {
 
@@ -97,8 +95,8 @@ public class CategoryOrderExceptionHandler {
     }
 
     // 400: JSON 문법 오류 → 명세상 fieldErrors는 {}
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException err) {
-        return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, Map.of()));
-    }
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException err) {
+//        return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, Map.of()));
+//    }
 }

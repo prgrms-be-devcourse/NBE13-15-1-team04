@@ -7,10 +7,11 @@ import com.kdt.coffeprince.dto.OrderSummaryResponse;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.service.OrderService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -68,5 +67,12 @@ public class OrderController {
     public OrderResponse cancel(
             @PathVariable @Positive(message = "주문 ID는 1 이상의 정수여야 합니다.") Long orderId) {
         return orderService.cancel(orderId);
+    }
+
+    @PostMapping("/{orderId}/reorder")             // A23 (요청 본문 없음)
+    public ResponseEntity<OrderResponse> reorder(
+            @PathVariable @Positive(message = "주문 ID는 1 이상의 정수여야 합니다.") Long orderId) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderService.reorder(orderId));
     }
 }
