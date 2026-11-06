@@ -16,7 +16,7 @@ public record OrderResponse(
         String address,
         String postcode,
         String orderedAt,
-        String shippingDate,
+        String deliveryDate,
         Integer totalAmount,
         List<OrderItemResponse> items,
         String status,

@@ -80,7 +80,7 @@ public class CategoryOrderExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
     }
 
-    // 400: 경로 ID가 숫자가 아님(예: /categories/abc) 또는 날짜 형식 오류(예: ?shippingDate=2026-13-45)
+    // 400: 경로 ID가 숫자가 아님(예: /categories/abc) 또는 날짜 형식 오류(예: ?deliveryDate=2026-13-45)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException err) {
         String message = LocalDate.class.equals(err.getRequiredType())
@@ -90,7 +90,7 @@ public class CategoryOrderExceptionHandler {
                 ErrorResponse.of(ErrorCode.VALIDATION_ERROR, Map.of(err.getName(), message)));
     }
 
-    // 400: 필수 쿼리 파라미터 누락. 예: /delivery-batches (shippingDate 없음)
+    // 400: 필수 쿼리 파라미터 누락. 예: /delivery-batches (deliveryDate 없음)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException err) {
         return ResponseEntity.badRequest().body(

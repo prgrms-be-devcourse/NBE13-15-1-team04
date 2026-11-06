@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record DeliveryBatchResponse(
-        LocalDate shippingDate,
+        LocalDate deliveryDate,
         String email,
         String address,
         String postcode,

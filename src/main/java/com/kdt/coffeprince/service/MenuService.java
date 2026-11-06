@@ -11,7 +11,7 @@ import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
-import com.kdt.coffeprince.dto.CreateMenuRequest;
+import com.kdt.coffeprince.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,6 +25,7 @@ import java.util.List;
 public class MenuService {
     private final MenuRepository menuRepository;
     private final CategoryRepository categoryRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public MenuResponse one(Long menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow();
@@ -107,6 +108,11 @@ public class MenuService {
                 .orElseThrow(() ->
                         new NotFoundException("메뉴를 찾을 수 없습니다.")
                 );
+
+        // 주문 항목이 참조 중인 메뉴는 삭제할 수 없다 (FK 위반으로 500이 나던 것을 409로)
+        if (orderItemRepository.existsByMenu_MenuId(menuId)) {
+            throw new BusinessException(ErrorCode.MENU_IN_USE);
+        }
 
         menuRepository.delete(menu);
     }

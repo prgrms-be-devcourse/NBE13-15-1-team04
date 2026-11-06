@@ -52,16 +52,16 @@
 
 ### DeliveryBatchesController (A14)
 
-- [ ] 날짜 누락·형식 오류가 Spring 기본 형식으로 나옴. 기대: `VALIDATION_ERROR` + `fieldErrors.shippingDate`
+- [ ] 날짜 누락·형식 오류가 Spring 기본 형식으로 나옴. 기대: `VALIDATION_ERROR` + `fieldErrors.deliveryDate`
 
 ## 3. 요청·응답 이름이 명세와 다른 것
 
 - [ ] **A11 주문 접수 요청 필드**: 명세 `email`·`address` ↔ 구현 `customerEmail`·`deliveryAddress` (`OrderCreateRequest`)
     - 명세대로 보내면 400 이 남. `fieldErrors` 키도 `customerEmail`로 나옴 → 제공 web 화면 연결 시 반드시 맞춰야 함
 - [ ] **A12 쿼리**: 명세 `email` ↔ 구현 `customerEmail`
-- [ ] **A12 응답 필드**: 명세 `id·createdAt·shippingDate` ↔ 구현 `orderId·orderedAt·deliveryDate` (`OrderSummaryResponse`).
+- [ ] **A12 응답 필드**: 명세 `id·createdAt·deliveryDate` ↔ 구현 `orderId·orderedAt·deliveryDate` (`OrderSummaryResponse`).
   `status`도 `CANCELED`(엔티티 값)로 나감 → 명세는 `CANCELLED`
-- [ ] **A14 쿼리**: 명세 `shippingDate` ↔ 구현 `deliveryDate`
+- [ ] **A14 쿼리**: 명세 `deliveryDate` ↔ 구현 `deliveryDate`
 - [ ] **A20 쿼리**: 명세 `keyword` ↔ 구현 `name`. 명세는 영문 대소문자 구분인데 구현은 `IgnoreCase`
 
 ## 4. 명세 입력 검사 중 빠진 것

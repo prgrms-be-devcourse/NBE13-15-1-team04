@@ -78,10 +78,10 @@ public class OrderService {
         }
 
         Instant orderedAt = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
-        LocalDate shippingDate = calculateShippingDate(orderedAt);
+        LocalDate deliveryDate = calculateDeliveryDate(orderedAt);
 
         boolean mismatch = orderRepository
-                .findByCustomerEmailAndDeliveryDateAndStatus(email, shippingDate, OrderStatus.PLACED)
+                .findByCustomerEmailAndDeliveryDateAndStatus(email, deliveryDate, OrderStatus.PLACED)
                 .stream()
                 .anyMatch(o -> !o.getDeliveryAddress().trim().equals(address)
                         || !o.getPostcode().trim().equals(postcode));
@@ -90,7 +90,7 @@ public class OrderService {
         }
 
         // 주문 + 항목 저장 (한 트랜잭션, cascade)
-        Order order = Order.place(email, address, postcode, orderedAt, shippingDate, null);
+        Order order = Order.place(email, address, postcode, orderedAt, deliveryDate, null);
         for (OrderCreateRequest.Item item : request.items()) {
             Menu menu = menus.get(item.menuId());
             order.addItem(new OrderItem(menu, item.quantity()));
@@ -99,7 +99,7 @@ public class OrderService {
     }
 
     // 서울 14:00:00 전이면 당일, 정각부터는 다음 날
-    private LocalDate calculateShippingDate(Instant orderedAt) {
+    private LocalDate calculateDeliveryDate(Instant orderedAt) {
         ZonedDateTime seoul = orderedAt.atZone(SEOUL);
         return seoul.toLocalTime().isBefore(CUTOFF)
                 ? seoul.toLocalDate()
@@ -145,19 +145,19 @@ public class OrderService {
 
     // ---------- A14 배송 묶음 ----------
     @Transactional(readOnly = true)
-    public List<DeliveryBatchResponse> findDeliveryBatches(LocalDate shippingDate) {
-        List<Order> orders = orderRepository.findByDeliveryDateAndStatus(shippingDate, OrderStatus.PLACED);
+    public List<DeliveryBatchResponse> findDeliveryBatches(LocalDate deliveryDate) {
+        List<Order> orders = orderRepository.findByDeliveryDateAndStatus(deliveryDate, OrderStatus.PLACED);
 
         // 이메일 오름차순
         Map<String, List<Order>> byEmail = orders.stream()
                 .collect(Collectors.groupingBy(Order::getCustomerEmail, TreeMap::new, Collectors.toList()));
 
         List<DeliveryBatchResponse> result = new ArrayList<>();
-        byEmail.forEach((email, group) -> result.add(toBatch(shippingDate, email, group)));
+        byEmail.forEach((email, group) -> result.add(toBatch(deliveryDate, email, group)));
         return result;
     }
 
-    private DeliveryBatchResponse toBatch(LocalDate shippingDate, String email, List<Order> group) {
+    private DeliveryBatchResponse toBatch(LocalDate deliveryDate, String email, List<Order> group) {
         List<Order> sorted = group.stream()
                 .sorted(Comparator.comparing(Order::getOrderId))
                 .toList();
@@ -184,7 +184,7 @@ public class OrderService {
                         e.getValue(), e.getKey().unitPrice() * e.getValue()))
                 .toList();
 
-        return new DeliveryBatchResponse(shippingDate, email,
+        return new DeliveryBatchResponse(deliveryDate, email,
                 first.getDeliveryAddress(), first.getPostcode(),
                 orderIds, orderIds.size(), totalQuantity, totalAmount, items);
     }

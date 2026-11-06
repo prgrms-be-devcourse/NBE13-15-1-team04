@@ -21,7 +21,7 @@ public class DeliveryBatchesController {
 
     @GetMapping                                            // A14
     public List<DeliveryBatchResponse> list(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate shippingDate) {
-        return orderService.findDeliveryBatches(shippingDate);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deliveryDate) {
+        return orderService.findDeliveryBatches(deliveryDate);
     }
 }

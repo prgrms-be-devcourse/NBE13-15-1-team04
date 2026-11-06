@@ -2,9 +2,9 @@ package com.kdt.coffeprince.dto;
 
 import com.kdt.coffeprince.entity.Order;
 
-// 이메일별 주문 목록 한 줄 (명세서: id, orderedAt, shippingDate, totalAmount, status)
+// 이메일별 주문 목록 한 줄 (명세서: id, orderedAt, shippingDate → deliveryDate 로 통일, totalAmount, status)
 public record OrderSummaryResponse(
-        Long id, String orderedAt, String shippingDate, Integer totalAmount, String status) {
+        Long id, String orderedAt, String deliveryDate, Integer totalAmount, String status) {
 
     public static OrderSummaryResponse from(Order order) {
         return new OrderSummaryResponse(

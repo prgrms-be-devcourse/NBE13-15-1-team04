@@ -479,7 +479,7 @@ Content-Type: application/json
 }
 
 ### A12 이메일별 주문 (기대: 200, OrderSummary[] 접수 시각 내림차순, 취소 주문 포함)
-### TODO: 명세 쿼리 이름은 email 인데 구현은 customerEmail. 응답 필드도 명세의 id·createdAt·shippingDate 가 아니라 orderId·orderedAt·deliveryDate 로 나옴
+### TODO: 명세 쿼리 이름은 email 인데 구현은 customerEmail. 명세의 shippingDate 는 Order 엔티티에 맞춰 deliveryDate 로 통일
 GET {{baseUrl}}/orders?customerEmail=buyer%40example.com
 
 ### A12 이메일별 주문 (주문 없는 이메일) — 기대: 200 + []
@@ -624,11 +624,11 @@ GET {{baseUrl}}/delivery-batches?deliveryDate={{shippingDate}}
 ### A14 배송 묶음 (주문 없는 날짜) — 기대: 200 + []
 GET {{baseUrl}}/delivery-batches?deliveryDate=2026-01-01
 
-### A14 배송 묶음 실패 (날짜 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.shippingDate
+### A14 배송 묶음 실패 (날짜 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.deliveryDate
 ### TODO: 본문이 Spring 기본 형식 (MissingServletRequestParameterException 미처리)
 GET {{baseUrl}}/delivery-batches
 
-### A14 배송 묶음 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.shippingDate
+### A14 배송 묶음 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.deliveryDate
 ### TODO: 본문이 Spring 기본 형식 (MethodArgumentTypeMismatchException 미처리). 2000~2099 범위 검사도 없음
 GET {{baseUrl}}/delivery-batches?deliveryDate=2026-13-45
 
