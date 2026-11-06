@@ -4,6 +4,15 @@
 
 ![시스템 아키텍처](./docs/images/coffe-prince-architecture.svg)
 
+## 🗃 데이터베이스 ERD
+
+![ERD](./docs/images/coffe-prince-erd.svg)
+
+본 프로젝트는 카테고리, 메뉴, 주문, 주문 항목의
+4개 테이블을 중심으로 구성되어 있습니다.
+
+자세한 설계 내용은 [ERD 문서](./docs/ERD.md)를 참고해 주세요.
+
 ## 실행 방법 (로컬)
 
 1. 로컬 MySQL을 띄우고 `coffeprince` 데이터베이스를 만듭니다.
