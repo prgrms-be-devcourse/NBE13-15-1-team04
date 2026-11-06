@@ -87,20 +87,29 @@ public class OrderService {
     }
 
     // 메뉴를 "현재" 상태로 한 번에 조회한다. 없으면 404, 판매 중지면 409
+    // 명세의 검사 순서(404 → 409): 한 항목이 판매 중지라도 다른 항목이 없는 메뉴면 404 가 우선이므로
+    // 항목을 끝까지 훑어 두 상태를 모두 모은 뒤 예외를 정한다
     // (재주문에서 메뉴 없음은 MENU_IN_USE 때문에 보통 생기지 않는다)
     private Map<Long, Menu> findAvailableMenus(List<Line> lines) {
         List<Long> menuIds = lines.stream().map(Line::menuId).distinct().toList();
         Map<Long, Menu> menus = menuRepository.findAllById(menuIds).stream()
                 .collect(Collectors.toMap(Menu::getMenuId, Function.identity()));
 
+        boolean anyNotFound = false;
+        boolean anyUnavailable = false;
         for (Line line : lines) {
             Menu menu = menus.get(line.menuId());
             if (menu == null) {
-                throw new BusinessException(ErrorCode.MENU_NOT_FOUND);
+                anyNotFound = true;
+            } else if (!Boolean.TRUE.equals(menu.getIsAvailable())) {
+                anyUnavailable = true;
             }
-            if (!Boolean.TRUE.equals(menu.getIsAvailable())) {
-                throw new BusinessException(ErrorCode.MENU_UNAVAILABLE);
-            }
+        }
+        if (anyNotFound) {
+            throw new BusinessException(ErrorCode.MENU_NOT_FOUND);
+        }
+        if (anyUnavailable) {
+            throw new BusinessException(ErrorCode.MENU_UNAVAILABLE);
         }
         return menus;
     }

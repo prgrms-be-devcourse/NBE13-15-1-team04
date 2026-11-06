@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -64,7 +63,8 @@ public class Order {
     @Column(name = "total_amount", nullable = false)
     private Integer totalAmount = 0;
 
-    @CreatedDate
+    // 접수 시각은 감사 필드가 아니라 업무 값: 서비스가 Clock 으로 한 번 읽어 배송일 계산에 쓰고 그대로 저장한다
+    // (@CreatedDate 를 붙이면 저장 시점의 시스템 시각으로 덮어써져 배송일과 출처가 갈라진다)
     @Column(name = "ordered_at", nullable = false, updatable = false)
     private Instant orderedAt;
 
