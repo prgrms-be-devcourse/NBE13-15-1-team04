@@ -1,6 +1,7 @@
 package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.config.RedisCacheConfig;
+import com.kdt.coffeprince.dto.MenuPageResponse;
 import com.kdt.coffeprince.dto.MenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.entity.Category;
@@ -12,6 +13,10 @@ import com.kdt.coffeprince.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,5 +111,16 @@ public class MenuService {
                 .stream()
                 .map(MenuResponse::from)
                 .toList();
+    }
+
+    public MenuPageResponse list(Pageable pageable) {
+        PageRequest fixed = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("menuId")
+        );
+
+        Page<MenuResponse> found = this.menuRepository.findPageItems(fixed);
+        return MenuPageResponse.fromPage(found);
     }
 }

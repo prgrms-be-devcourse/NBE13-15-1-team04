@@ -1,9 +1,13 @@
 package com.kdt.coffeprince.repository;
 
+import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.entity.Menu;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -23,4 +27,15 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
         return findById(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_NOT_FOUND));
     }
+
+    @Query(
+            value = """
+                    select new com.kdt.coffeprince.dto.MenuResponse(m.menuId, c.categoryId, m.name, m.price, m.description, m.isAvailable)
+                    from Menu m join m.category c
+                    """,
+            countQuery = """
+                    select count(m)
+                    from Menu m join m.category c
+                    """)
+    Page<MenuResponse> findPageItems(Pageable pageable);
 }

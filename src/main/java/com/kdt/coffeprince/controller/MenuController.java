@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -120,4 +122,12 @@ public class MenuController {
     public List<MenuResponse> searchMenus(@Valid @ModelAttribute MenuSearchRequest request) {
         return menuService.searchMenus(request.keyword());
     }
+
+    @GetMapping("/page")
+    public MenuPageResponse getPageMenus(
+            @ParameterObject Pageable pageable
+    ) {
+        return menuService.list(pageable);
+    }
+
 }
