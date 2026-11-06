@@ -104,36 +104,33 @@ class StatisticsControllerTest {
 
 
     @Test
-    void getOrderStatistics_without_date_uses_today() throws Exception {
-        LocalDate today = DateUtils.today();
-        given(this.statisticsService.getOrderStatisticsByDate(any(LocalDate.class)))
-                .willReturn(new OrderStatistics(today, 0, 0, 0, 0, 0));
-
+    void getOrderStatistics_without_date_returns_400() throws Exception {
         this.mockMvc.perform(get(URL)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.date").value(today.toString()));
-
-        ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
-        verify(this.statisticsService).getOrderStatisticsByDate(captor.capture());
-        assertEquals(today, captor.getValue());
-    }
-
-    @Test
-    void future_date_is_400_before_service() throws Exception {
-        LocalDate tomorrow = DateUtils.today().plusDays(1);
-
-        this.mockMvc.perform(get(URL)
-                        .param("date", tomorrow.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
-                .andExpect(jsonPath("$.fieldErrors.date").value("오늘 또는 그 이전 날짜여야 합니다."));
+                .andExpect(jsonPath("$.fieldErrors.date").value("필수 값입니다."));
 
         verifyNoInteractions(this.statisticsService);
+    }
+
+    @Test
+    void getOrderStatistics_with_future_date_returns_200_zero_counts() throws Exception {
+        LocalDate tomorrow = DateUtils.today().plusDays(1);
+        given(this.statisticsService.getOrderStatisticsByDate(tomorrow))
+                .willReturn(new OrderStatistics(tomorrow, 0, 0, 0, 0, 0));
+
+        this.mockMvc.perform(get(URL)
+                        .param("date", tomorrow.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.date").value(tomorrow.toString()))
+                .andExpect(jsonPath("$.orderCount").value(0));
+
+        verify(this.statisticsService).getOrderStatisticsByDate(tomorrow);
     }
 
     @Test
@@ -186,36 +183,33 @@ class StatisticsControllerTest {
     }
 
     @Test
-    void getMenuStatistics_without_date_uses_today() throws Exception {
-        LocalDate today = DateUtils.today();
-        given(this.statisticsService.getMenuStatisticsByDate(any(LocalDate.class)))
-                .willReturn(List.of());
-
+    void getMenuStatistics_without_date_returns_400() throws Exception {
         this.mockMvc.perform(get(MENU_URL)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray());
-
-        ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
-        verify(this.statisticsService).getMenuStatisticsByDate(captor.capture());
-        assertEquals(today, captor.getValue());
-    }
-
-    @Test
-    void getMenuStatistics_with_future_date_returns_400_before_service() throws Exception {
-        LocalDate tomorrow = DateUtils.today().plusDays(1);
-
-        this.mockMvc.perform(get(MENU_URL)
-                        .param("date", tomorrow.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
-                .andExpect(jsonPath("$.fieldErrors.date").value("오늘 또는 그 이전 날짜여야 합니다."));
+                .andExpect(jsonPath("$.fieldErrors.date").value("필수 값입니다."));
 
         verifyNoInteractions(this.statisticsService);
+    }
+
+    @Test
+    void getMenuStatistics_with_future_date_returns_200_empty_list() throws Exception {
+        LocalDate tomorrow = DateUtils.today().plusDays(1);
+        given(this.statisticsService.getMenuStatisticsByDate(tomorrow))
+                .willReturn(List.of());
+
+        this.mockMvc.perform(get(MENU_URL)
+                        .param("date", tomorrow.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+
+        verify(this.statisticsService).getMenuStatisticsByDate(tomorrow);
     }
 
     @Test
@@ -296,34 +290,32 @@ class StatisticsControllerTest {
     }
 
     @Test
-    void getCustomerStatistics_without_date_uses_today() throws Exception {
-        LocalDate today = DateUtils.today();
-        given(this.statisticsService.getCustomerStatisticsByDate(any(LocalDate.class)))
-                .willReturn(List.of());
-
+    void getCustomerStatistics_without_date_returns_400() throws Exception {
         this.mockMvc.perform(get(CUSTOMER_URL)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        ArgumentCaptor<LocalDate> captor = ArgumentCaptor.forClass(LocalDate.class);
-        verify(this.statisticsService).getCustomerStatisticsByDate(captor.capture());
-        assertEquals(today, captor.getValue());
-    }
-
-    @Test
-    void getCustomerStatistics_with_future_date_returns_400_before_service() throws Exception {
-        LocalDate tomorrow = DateUtils.today().plusDays(1);
-
-        this.mockMvc.perform(get(CUSTOMER_URL)
-                        .param("date", tomorrow.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("입력값을 확인해 주세요."))
-                .andExpect(jsonPath("$.fieldErrors.date").value("오늘 또는 그 이전 날짜여야 합니다."));
+                .andExpect(jsonPath("$.fieldErrors.date").value("필수 값입니다."));
 
         verifyNoInteractions(this.statisticsService);
+    }
+
+    @Test
+    void getCustomerStatistics_with_future_date_returns_200_empty_list() throws Exception {
+        LocalDate tomorrow = DateUtils.today().plusDays(1);
+        given(this.statisticsService.getCustomerStatisticsByDate(tomorrow))
+                .willReturn(List.of());
+
+        this.mockMvc.perform(get(CUSTOMER_URL)
+                        .param("date", tomorrow.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+
+        verify(this.statisticsService).getCustomerStatisticsByDate(tomorrow);
     }
 }
