@@ -1,5 +1,6 @@
 package com.kdt.coffeprince.controller;
 
+import com.kdt.coffeprince.dto.MenuPageResponse;
 import com.kdt.coffeprince.dto.MenuRequest;
 import com.kdt.coffeprince.dto.MenuResponse;
 import com.kdt.coffeprince.exception.BusinessException;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -214,5 +216,63 @@ class MenuControllerTest {
                 .andExpect(jsonPath("$.code").value("MENU_NOT_FOUND"))
                 .andExpect(jsonPath("$.message").value("메뉴를 찾을 수 없습니다."))
                 .andExpect(jsonPath("$.fieldErrors").isEmpty());
+    }
+
+    @Test
+    @DisplayName("페이징: 파라미터가 없으면 page=0, size=10 으로 조회하고 페이지 정보를 반환한다")
+    void 페이징_기본값은_page0_size10이다() throws Exception {
+        MenuResponse menu = new MenuResponse(1L, 1L, "Columbia Nariñó", 5000, "설명", true);
+        when(menuService.list(0, 10))
+                .thenReturn(new MenuPageResponse(List.of(menu), 0, 10, 11, 2));
+
+        mockMvc.perform(get("/api/v1/menus/page"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.number").value(0))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.totalElements").value(11))
+                .andExpect(jsonPath("$.totalPages").value(2));
+
+        verify(menuService).list(0, 10);
+    }
+
+    @Test
+    @DisplayName("페이징: page=1&size=5 를 그대로 서비스에 전달한다")
+    void 페이징_파라미터를_서비스에_전달한다() throws Exception {
+        when(menuService.list(1, 5))
+                .thenReturn(new MenuPageResponse(List.of(), 1, 5, 11, 3));
+
+        mockMvc.perform(get("/api/v1/menus/page").param("page", "1").param("size", "5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.size").value(5));
+
+        verify(menuService).list(1, 5);
+    }
+
+    @Test
+    @DisplayName("페이징: page 가 음수·소수·문자면 400 VALIDATION_ERROR 와 fieldErrors.page 를 반환한다")
+    void 페이징_page가_잘못되면_400을_반환한다() throws Exception {
+        for (String page : List.of("-1", "1.5", "abc", "9999999999")) {
+            mockMvc.perform(get("/api/v1/menus/page").param("page", page))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                    .andExpect(jsonPath("$.fieldErrors.page").value("0 이상의 정수여야 합니다."));
+        }
+
+        verify(menuService, never()).list(anyInt(), anyInt());
+    }
+
+    @Test
+    @DisplayName("페이징: size 가 0·51·문자면 400 VALIDATION_ERROR 와 fieldErrors.size 를 반환한다")
+    void 페이징_size가_범위를_벗어나면_400을_반환한다() throws Exception {
+        for (String size : List.of("0", "51", "abc")) {
+            mockMvc.perform(get("/api/v1/menus/page").param("size", size))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                    .andExpect(jsonPath("$.fieldErrors.size").value("1 이상 50 이하의 정수여야 합니다."));
+        }
+
+        verify(menuService, never()).list(anyInt(), anyInt());
     }
 }

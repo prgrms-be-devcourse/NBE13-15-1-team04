@@ -2,6 +2,7 @@ package com.kdt.coffeprince.controller;
 
 import com.kdt.coffeprince.dto.*;
 import com.kdt.coffeprince.service.MenuService;
+import com.kdt.coffeprince.validation.IntRange;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -9,8 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +24,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MenuController {
     private final MenuService menuService;
+
+    // 페이징 기본값·상한. 명세: page 기본 0, size 기본 10, size 1~50
+    private static final String DEFAULT_PAGE = "0";
+    private static final String DEFAULT_PAGE_SIZE = "10";
+    private static final int MAX_PAGE_SIZE = 50;
 
     @GetMapping("/{menuId}")
     public MenuResponse getMenu(
@@ -123,11 +127,19 @@ public class MenuController {
         return menuService.searchMenus(request.keyword());
     }
 
+    @Operation(
+            summary = "메뉴 페이징 조회",
+            description = "판매 중지 메뉴를 포함한 전체 메뉴를 ID 오름차순으로 페이지 단위 조회합니다. page 는 0 이상, size 는 1~50 입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "page·size 가 정수가 아니거나 허용 범위를 벗어남")
+    })
     @GetMapping("/page")
     public MenuPageResponse getPageMenus(
-            @ParameterObject Pageable pageable
+            @RequestParam(defaultValue = DEFAULT_PAGE) @IntRange(message = "{IntRange.page}") String page,
+            @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @IntRange(min = 1, max = MAX_PAGE_SIZE) String size
     ) {
-        return menuService.list(pageable);
+        return menuService.list(Integer.parseInt(page), Integer.parseInt(size));
     }
-
 }

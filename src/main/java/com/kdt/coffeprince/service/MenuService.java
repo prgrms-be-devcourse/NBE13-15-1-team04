@@ -15,7 +15,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,14 +112,11 @@ public class MenuService {
                 .toList();
     }
 
-    public MenuPageResponse list(Pageable pageable) {
-        PageRequest fixed = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by("menuId")
-        );
-
-        Page<MenuResponse> found = this.menuRepository.findPageItems(fixed);
+    // 판매 중지 메뉴 포함, menuId 오름차순 고정. 해당 페이지 행만 DB 에서 가져온다
+    @Transactional(readOnly = true)
+    public MenuPageResponse list(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("menuId"));
+        Page<MenuResponse> found = menuRepository.findPageItems(pageRequest);
         return MenuPageResponse.fromPage(found);
     }
 }
