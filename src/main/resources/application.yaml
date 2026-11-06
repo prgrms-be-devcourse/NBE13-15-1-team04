@@ -14,7 +14,11 @@ spring:
         default_batch_fetch_size: 100
   jackson:
     mapper:
+      # "false"·"1" 같은 문자열을 boolean·숫자로 바꾸지 않음 (잘못된 자료형은 400)
       allow-coercion-of-scalars: false
+    deserialization:
+      # 50.5 를 정수 50 으로 자르지 않음 (price·quantity 등은 정수만 허용)
+      accept-float-as-int: false
 
 # 선택 심화: RestClient 외부 게시글 조회 대상 주소 (환경 변수 REFERENCE_BASE_URL 로 변경 가능)
 reference:
