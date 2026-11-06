@@ -212,8 +212,10 @@ Redis를 사용하지 않을 경우 `local.env`에 `CACHE_ENABLED=false`를 추�
 |---|---|
 | `category` | `Single Origin`, `Blend` |
 | `menu` | `Columbia Nariñó` (5,000원), `Brazil Serra Do Caparaó` (7,000원), `Columbia Quindío (White Wine Extended Fermentation)` (9,000원), `Ethiopia Sidamo` (11,000원) |
+| `orders` | `buyer@example.com` 주문 4건 (지난 배송 1건, 내일 배송 2건 중 1건은 재주문, 취소 1건), `other@example.com` 주문 2건 (오늘·내일 배송) — 배송일·접수 시각은 적재 시점 기준 상대값 |
+| `order_item` | 위 주문 6건의 주문 상세 10건 (메뉴 초기 데이터 기준 스냅샷) |
 
-> **주의:** 초기 데이터에 `ON DUPLICATE KEY UPDATE`가 사용되므로, 로컬 애플리케이션을 재실행하면 동일한 기본 키의 카테고리·메뉴 데이터가 스크립트 값으로 갱신될 수 있습니다. 또한 로컬 프로파일을 운영 DB에 연결하면 `ddl-auto: update`가 스키마를 변경할 수 있으므로 사용하지 마세요.
+> **주의:** 초기 데이터에 `ON DUPLICATE KEY UPDATE`가 사용되므로, 로컬 애플리케이션을 재실행하면 동일한 기본 키의 카테고리·메뉴·주문·주문 상세 데이터가 스크립트 값으로 갱신될 수 있습니다 (예: 테스트 중 수정한 주문 메모·취소 상태가 초기값으로 되돌아감). 또한 로컬 프로파일을 운영 DB에 연결하면 `ddl-auto: update`가 스키마를 변경할 수 있으므로 사용하지 마세요.
 
 HikariCP에는 초기 연결 실패 관련 설정 `initialization-fail-timeout: 30000`(ms)이 적용되어 있습니다. 이 값은 모든 DB 연결 오류가 정확히 30초에 종료된다는 의미는 아닙니다.
 
