@@ -31,8 +31,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Import(TestClockConfig.class)
 @Transactional
-class OrderBusinessRuleTest {
 
+class OrderBusinessRuleTest {
     //값으 변경 가능
     private static final long MENU_ID = 1L;
     private static final String ADDRESS = "서울시 실습로 10 101호";
