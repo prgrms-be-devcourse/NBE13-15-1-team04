@@ -76,6 +76,58 @@ Content-Type: application/json
 
 ※ API 목록은 현재 `dev` 브랜치의 Controller 코드를 기준으로 작성했습니다. 최종 제출 전 실제 API 테스트 결과를 확인해야 합니다.
 
+## ⚙️ 핵심 구현 방식 및 설계 포인트
+
+### 1. Redis 기반 메뉴 목록 캐싱
+
+전체 메뉴 조회(`GET /api/v1/menus`)는 동일한 결과가 반복해서 요청될 수 있어 Spring Cache와 Redis를 적용했습니다.
+
+- `@Cacheable`로 메뉴 목록 조회 결과를 `menus::all` 키에 저장하고, TTL을 60초로 설정했습니다.
+- 메뉴 등록·수정·삭제·판매 여부 변경 시 `@CacheEvict`로 관련 캐시를 삭제하도록 구성했습니다.
+- 캐시를 비활성화하면 DB를 직접 조회할 수 있도록 `CACHE_ENABLED` 설정을 제공합니다.
+
+**설계 의도:** 반복 조회 시 불필요한 DB 접근을 줄이면서 메뉴 변경 사항이 이전 캐시에 계속 남지 않도록 처리합니다. 실제 응답 속도 개선 수치는 별도의 성능 측정이 필요합니다.
+
+관련 코드: [RedisCacheConfig.java](./src/main/java/com/kdt/coffeprince/config/RedisCacheConfig.java), [MenuService.java](./src/main/java/com/kdt/coffeprince/service/MenuService.java)
+
+### 2. 주문과 주문 항목의 트랜잭션 처리
+
+주문 생성은 주문 정보와 여러 주문 항목을 함께 저장해야 하는 작업입니다.
+
+- `OrderService.place()`에 `@Transactional`을 적용했습니다.
+- `Order`와 `OrderItem`은 JPA 연관관계 및 `CascadeType.ALL`을 통해 함께 저장합니다.
+- 주문 접수와 재주문은 공통 `createOrder()` 로직을 사용하며, 메뉴 판매 가능 여부와 배송지 조건을 확인한 뒤 저장합니다.
+
+**설계 의도:** 주문 처리 중 오류가 발생했을 때 주문 정보와 주문 항목이 일부만 저장되는 상황을 방지합니다.
+
+관련 코드: [OrderService.java](./src/main/java/com/kdt/coffeprince/service/OrderService.java), [Order.java](./src/main/java/com/kdt/coffeprince/entity/Order.java)
+
+### 3. 주문 시점의 메뉴 정보 보존
+
+주문 이후 메뉴 이름이나 가격이 변경되더라도 기존 주문 금액과 상품 내역은 주문 당시 정보로 확인할 수 있도록 구성했습니다.
+
+- `OrderItem` 생성 시 `Menu`의 이름과 가격을 `menuName`, `unitPrice`에 별도 저장합니다.
+- 수량과 주문 당시 단가로 `lineAmount`를 계산합니다.
+- 주문에서 사용 중인 메뉴는 삭제 전에 사용 여부를 확인하고 `MENU_IN_USE` 예외로 차단합니다.
+
+**설계 의도:** 메뉴 정보의 변경이 과거 주문 내역을 바꾸지 않도록 하며, 참조 중인 메뉴를 임의로 삭제하지 못하게 합니다.
+
+관련 코드: [OrderItem.java](./src/main/java/com/kdt/coffeprince/entity/OrderItem.java), [MenuService.java](./src/main/java/com/kdt/coffeprince/service/MenuService.java)
+
+### 4. 업무 규칙에 따른 배송일·취소 기한 계산
+
+주문 접수와 취소에는 서울 시간 기준의 업무 규칙을 적용했습니다.
+
+- 주문 접수 시각이 **14:00 이전**이면 배송일을 당일로, **14:00부터**는 다음 날로 계산합니다.
+- 주문 취소는 **저장된 배송일의 14:00 이전**에만 가능하도록 검사합니다.
+- 취소 시 주문 상태와 취소 시각을 변경하되 기존 주문 항목과 금액은 유지합니다.
+
+**설계 의도:** 주문 처리 기준 시간을 명확히 하고, 취소 이후에도 기존 주문 이력을 확인할 수 있도록 합니다.
+
+관련 코드: [OrderService.java](./src/main/java/com/kdt/coffeprince/service/OrderService.java), [Order.java](./src/main/java/com/kdt/coffeprince/entity/Order.java)
+
+> 위 내용은 현재 `dev` 브랜치의 구현 코드를 기준으로 정리했습니다. 성능 개선 수치나 운영 환경에서의 검증 결과를 의미하지는 않습니다.
+
 ## 실행 방법 (로컬)
 
 1. 로컬 MySQL을 띄우고 `coffeprince` 데이터베이스를 만듭니다.
