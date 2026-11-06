@@ -13,6 +13,69 @@
 
 자세한 설계 내용은 [ERD 문서](./docs/ERD.md)를 참고해 주세요.
 
+## 📡 API 명세
+
+Coffe Prince는 카테고리, 메뉴, 주문, 배송 및 통계 기능을 REST API로 제공합니다.
+
+**기본 API 주소:** `http://localhost:8080/api/v1`
+
+**Swagger UI:** `http://localhost:8080/swagger-ui/index.html` (로컬 서버 실행 후 접속)
+
+### 주요 API 목록
+
+| 구분 | Method | Endpoint | 기능 |
+|---|---|---|---|
+| 카테고리 | GET | `/categories` | 카테고리 목록 조회 |
+| 카테고리 | POST | `/categories` | 카테고리 등록 |
+| 카테고리 | GET | `/categories/{categoryId}/menus` | 카테고리별 메뉴 조회 |
+| 메뉴 | GET | `/menus` | 전체 메뉴 조회 |
+| 메뉴 | GET | `/menus/{menuId}` | 메뉴 상세 조회 |
+| 메뉴 | POST | `/menus` | 메뉴 등록 |
+| 메뉴 | PUT | `/menus/{menuId}` | 메뉴 수정 |
+| 메뉴 | DELETE | `/menus/{menuId}` | 메뉴 삭제 |
+| 메뉴 | GET | `/menus/available` | 판매 가능 메뉴 조회 |
+| 메뉴 | GET | `/menus/search?keyword={keyword}` | 메뉴명 검색 |
+| 메뉴 | PUT | `/menus/{menuId}/availability` | 메뉴 판매 여부 변경 |
+| 주문 | POST | `/orders` | 주문 접수 |
+| 주문 | GET | `/orders?email={email}` | 이메일별 주문 조회 |
+| 주문 | GET | `/orders/{orderId}` | 주문 상세 조회 |
+| 주문 | POST | `/orders/{orderId}/cancel` | 주문 취소 |
+| 주문 | POST | `/orders/{orderId}/reorder` | 재주문 |
+| 주문 | PUT | `/orders/{orderId}/memo` | 주문 메모 수정 |
+| 배송 | GET | `/delivery-batches?deliveryDate={date}` | 배송일별 주문 묶음 조회 |
+| 통계 | GET | `/statistics/orders?date={date}` | 주문 통계 |
+| 통계 | GET | `/statistics/menus?date={date}` | 메뉴 통계 |
+| 통계 | GET | `/statistics/customers?date={date}` | 고객 통계 |
+
+카테고리 상세 조회·수정·삭제 등 나머지 API와 구체적인 요청·응답 형식은 Swagger UI에서 확인할 수 있습니다.
+
+추가 심화 기능으로 RestClient를 활용한 외부 게시글 조회 API(`GET /reference/posts/{postId}`)도 구현되어 있습니다.
+
+### 대표 API 요청 예시
+
+**메뉴 등록 — POST /api/v1/menus**
+
+```http
+POST /api/v1/menus
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "name": "House Blend",
+  "price": 6000,
+  "description": "블렌드 원두 패키지입니다."
+}
+```
+
+메뉴 등록에 성공하면 `201 Created` 상태 코드와 등록된 메뉴 정보를 반환합니다.
+
+### API 문서 및 테스트
+
+- **Swagger UI:** 로컬 서버 실행 후 `http://localhost:8080/swagger-ui/index.html`
+- **HTTP 요청 테스트:** [api-check.http](./requests/api-check.http)
+
+※ API 목록은 현재 `dev` 브랜치의 Controller 코드를 기준으로 작성했습니다. 최종 제출 전 실제 API 테스트 결과를 확인해야 합니다.
+
 ## 실행 방법 (로컬)
 
 1. 로컬 MySQL을 띄우고 `coffeprince` 데이터베이스를 만듭니다.
