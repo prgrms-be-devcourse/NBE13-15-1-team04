@@ -135,7 +135,7 @@ public class OrderService {
             return OrderResponse.from(order);
         }
         // DB(DATETIME)가 초 단위라서 초 미만은 버림 (반올림돼서 시각이 달라지는 것 방지)
-        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant now = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
         if (!order.isCancellableAt(now)) {
             throw new BusinessException(ErrorCode.ORDER_NOT_CANCELLABLE);
         }
