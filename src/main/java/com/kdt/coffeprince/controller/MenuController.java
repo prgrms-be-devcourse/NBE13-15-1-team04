@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,16 +25,16 @@ public class MenuController {
     private final MenuService menuService;
 
     @GetMapping("/{menuId}")
-    public ResponseEntity<MenuResponse> getMenu(
+    public MenuResponse getMenu(
             @Positive
             @PathVariable("menuId") Long menuId
     ) {
-        return ResponseEntity.ok(menuService.one(menuId));
+        return menuService.one(menuId);
     }
 
     @GetMapping
-    public ResponseEntity<List<MenuResponse>> getMenus() {
-        return ResponseEntity.ok(menuService.all());
+    public List<MenuResponse> getMenus() {
+        return menuService.all();
     }
 
     @Operation(
@@ -46,8 +45,8 @@ public class MenuController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping("/available")
-    public ResponseEntity<List<MenuResponse>> getAvailableMenus() {
-        return ResponseEntity.ok(menuService.available());
+    public List<MenuResponse> getAvailableMenus() {
+        return menuService.available();
     }
 
     @Operation(
@@ -60,24 +59,21 @@ public class MenuController {
             @ApiResponse(responseCode = "404", description = "메뉴 또는 카테고리를 찾을 수 없음")
     })
     @PutMapping("/{menuId}")
-    public ResponseEntity<MenuResponse> updateMenu(
-
+    public MenuResponse updateMenu(
             @Positive @PathVariable("menuId") Long menuId,
             @Valid @RequestBody PutMenuRequest body
     ) {
-        return ResponseEntity.ok(menuService.updateMenu(menuId, body));
+        return menuService.updateMenu(menuId, body);
     }
 
     @PutMapping("/{menuId}/availability")         // A21
-    public ResponseEntity<MenuResponse> changeAvailability(
+    public MenuResponse changeAvailability(
             @PathVariable
             @Positive
             Long menuId,
             @Valid @RequestBody MenuAvailabilityRequest request
     ) {
-        return ResponseEntity.ok(
-                menuService.changeAvailability(menuId, request.available())
-        );
+        return menuService.changeAvailability(menuId, request.available());
     }
 
     @Operation(
@@ -90,14 +86,11 @@ public class MenuController {
             @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
     })
     @PostMapping
-    public ResponseEntity<MenuResponse> createMenu(
+    @ResponseStatus(HttpStatus.CREATED)
+    public MenuResponse createMenu(
             @Valid @RequestBody CreateMenuRequest body
     ) {
-        MenuResponse response = menuService.createMenu(body);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        return menuService.createMenu(body);
     }
 
     @Operation(
@@ -109,12 +102,11 @@ public class MenuController {
             @ApiResponse(responseCode = "404", description = "메뉴를 찾을 수 없음")
     })
     @DeleteMapping("/{menuId}")
-    public ResponseEntity<Void> deleteMenu(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMenu(
             @Positive @PathVariable("menuId") Long menuId
     ) {
         menuService.deleteMenu(menuId);
-
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -125,7 +117,7 @@ public class MenuController {
             @ApiResponse(responseCode = "200", description = "검색 성공")
     })
     @GetMapping("/search")
-    public ResponseEntity<List<MenuResponse>> searchMenus(@Valid @ModelAttribute MenuSearchRequest request) {
-        return ResponseEntity.ok(menuService.searchMenus(request.keyword()));
+    public List<MenuResponse> searchMenus(@Valid @ModelAttribute MenuSearchRequest request) {
+        return menuService.searchMenus(request.keyword());
     }
 }

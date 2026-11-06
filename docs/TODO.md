@@ -90,7 +90,7 @@
 - [ ] 읽기 트랜잭션: Order 조회는 전부 `@Transactional(readOnly = true)`인데 Menu는 `searchMenus()`만, Category는 없음.
   `Menu.category`가 LAZY라 응답에 카테고리 이름을 추가하는 순간 `open-in-view=false`에서 500 → 조회 메서드에 모두 붙일 것
 - [ ] 컨트롤러 주입 방식: `CategoryController`만 생성자 직접 작성, 나머지는 `@RequiredArgsConstructor`
-- [ ] 응답 방식: Category·Order는 `@ResponseStatus`, Menu는 `ResponseEntity` → 별도 이슈에서 프로젝트 단위로 통일
+- [x] 응답 방식: 모든 컨트롤러를 객체 직접 반환 + `@ResponseStatus` 로 통일 (#57)
 - [ ] 삭제 방식: Category는 `@Modifying @Query deleteCategoryById()`, Menu는 `repository.delete(entity)` → 한쪽으로 통일
 - [ ] 등록·수정 DTO 중복: `CategoryRequest`/`CategoryUpdateRequest`, `CreateMenuRequest`/`PutMenuRequest`가 내용이 같음.
   의도적 분리가 아니면 하나로 합치기

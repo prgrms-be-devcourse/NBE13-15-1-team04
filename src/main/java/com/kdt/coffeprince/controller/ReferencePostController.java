@@ -4,7 +4,6 @@ import com.kdt.coffeprince.dto.ReferencePostResponse;
 import com.kdt.coffeprince.service.ReferencePostService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +19,8 @@ public class ReferencePostController {
     private final ReferencePostService referencePostService;
 
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<ReferencePostResponse> getPost(
+    public ReferencePostResponse getPost(
             @PathVariable @Positive(message = "게시글 ID는 1 이상의 정수여야 합니다.") Long postId) {
-        return ResponseEntity.ok(referencePostService.getPost(postId));
+        return referencePostService.getPost(postId);
     }
 }

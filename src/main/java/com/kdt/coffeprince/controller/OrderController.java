@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,9 +72,9 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/reorder")             // A23 (요청 본문 없음)
-    public ResponseEntity<OrderResponse> reorder(
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrderResponse reorder(
             @PathVariable @Positive Long orderId) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orderService.reorder(orderId));
+        return orderService.reorder(orderId);
     }
 }
