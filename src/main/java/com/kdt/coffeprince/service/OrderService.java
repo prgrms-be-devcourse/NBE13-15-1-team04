@@ -76,7 +76,7 @@ public class OrderService {
 
         // 접수 시각 기준으로 배송일 계산 (재주문은 처리 시각 기준으로 다시 계산)
         Instant orderedAt = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
-        LocalDate shippingDate = calculateShippingDate(orderedAt);
+        LocalDate shippingDate = calculateDeliveryDate(orderedAt);
         validateSameAddress(email, shippingDate, address, postcode);
 
         Order order = Order.place(email, address, postcode, orderedAt, shippingDate, reorderSource);
@@ -105,26 +105,36 @@ public class OrderService {
         return menus;
     }
 
-    // 서울 14:00:00 전이면 당일, 정각부터는 다음 날 (연말이면 다음 해로 넘어감)
-    private LocalDate calculateShippingDate(Instant orderedAt) {
-        ZonedDateTime seoul = orderedAt.atZone(DateUtils.ZONE);
-        return seoul.toLocalTime().isBefore(CUTOFF)
-                ? seoul.toLocalDate()
-                : seoul.toLocalDate().plusDays(1);
-    }
+        Instant orderedAt = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
+        LocalDate deliveryDate = calculateDeliveryDate(orderedAt);
 
     // 같은 이메일·배송일의 PLACED 주문과 주소·우편번호가 다르면 409
     private void validateSameAddress(String email, LocalDate shippingDate, String address, String postcode) {
         boolean mismatch = orderRepository
-                .findByCustomerEmailAndDeliveryDateAndStatus(email, shippingDate, OrderStatus.PLACED)
+                .findByCustomerEmailAndDeliveryDateAndStatus(email, deliveryDate, OrderStatus.PLACED)
                 .stream()
                 .anyMatch(o -> !o.getDeliveryAddress().trim().equals(address)
                         || !o.getPostcode().trim().equals(postcode));
         if (mismatch) {
             throw new BusinessException(ErrorCode.ADDRESS_MISMATCH);
         }
+
+        // 주문 + 항목 저장 (한 트랜잭션, cascade)
+        Order order = Order.place(email, address, postcode, orderedAt, deliveryDate, null);
+        for (OrderItem item : request.items()) {
+            Menu menu = menus.get(item.menuId());
+            order.addItem(new OrderItem(menu, item.quantity()));
+        }
+        return OrderResponse.from(orderRepository.save(order));
     }
 
+    // 서울 14:00:00 전이면 당일, 정각부터는 다음 날
+    private LocalDate calculateDeliveryDate(Instant orderedAt) {
+        ZonedDateTime seoul = orderedAt.atZone(DateUtils.ZONE);
+        return seoul.toLocalTime().isBefore(CUTOFF)
+                ? seoul.toLocalDate()
+                : seoul.toLocalDate().plusDays(1);
+    }
 
     // ---------- A12 이메일별 주문 ----------
     @Transactional(readOnly = true)
@@ -149,7 +159,7 @@ public class OrderService {
             return OrderResponse.from(order);
         }
         // DB(DATETIME)가 초 단위라서 초 미만은 버림 (반올림돼서 시각이 달라지는 것 방지)
-        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant now = Instant.now(clock).truncatedTo(ChronoUnit.SECONDS);
         if (!order.isCancellableAt(now)) {
             throw new BusinessException(ErrorCode.ORDER_NOT_CANCELLABLE);
         }
@@ -159,19 +169,19 @@ public class OrderService {
 
     // ---------- A14 배송 묶음 ----------
     @Transactional(readOnly = true)
-    public List<DeliveryBatchResponse> findDeliveryBatches(LocalDate shippingDate) {
-        List<Order> orders = orderRepository.findByDeliveryDateAndStatus(shippingDate, OrderStatus.PLACED);
+    public List<DeliveryBatchResponse> findDeliveryBatches(LocalDate deliveryDate) {
+        List<Order> orders = orderRepository.findByDeliveryDateAndStatus(deliveryDate, OrderStatus.PLACED);
 
         // 이메일 오름차순
         Map<String, List<Order>> byEmail = orders.stream()
                 .collect(Collectors.groupingBy(Order::getCustomerEmail, TreeMap::new, Collectors.toList()));
 
         List<DeliveryBatchResponse> result = new ArrayList<>();
-        byEmail.forEach((email, group) -> result.add(toBatch(shippingDate, email, group)));
+        byEmail.forEach((email, group) -> result.add(toBatch(deliveryDate, email, group)));
         return result;
     }
 
-    private DeliveryBatchResponse toBatch(LocalDate shippingDate, String email, List<Order> group) {
+    private DeliveryBatchResponse toBatch(LocalDate deliveryDate, String email, List<Order> group) {
         List<Order> sorted = group.stream()
                 .sorted(Comparator.comparing(Order::getOrderId))
                 .toList();
@@ -198,7 +208,7 @@ public class OrderService {
                         e.getValue(), e.getKey().unitPrice() * e.getValue()))
                 .toList();
 
-        return new DeliveryBatchResponse(shippingDate, email,
+        return new DeliveryBatchResponse(deliveryDate, email,
                 first.getDeliveryAddress(), first.getPostcode(),
                 orderIds, orderIds.size(), totalQuantity, totalAmount, items);
     }

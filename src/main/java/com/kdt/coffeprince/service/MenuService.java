@@ -11,7 +11,6 @@ import com.kdt.coffeprince.exception.ErrorCode;
 import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
-import com.kdt.coffeprince.dto.CreateMenuRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

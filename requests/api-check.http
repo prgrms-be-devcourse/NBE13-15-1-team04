@@ -553,7 +553,10 @@ GET {{baseUrl}}/orders?email=not-an-email
 @orderId=6
 GET {{baseUrl}}/orders/{{orderId}}
 
+### TODO: 존재하는 주문인데 500 에러 발생 중 (OrderService.find 에 @Transactional 이 없고 open-in-view=false 라 items 지연 로딩 실패로 추정)
+
 ### A13 주문 상세 실패 (존재하지 않는 주문) — 기대: 404 ORDER_NOT_FOUND, fieldErrors={}
+### TODO: 상태는 404 이지만 본문이 Spring 기본 형식 (ResponseStatusException)
 @invalidOrderId=99999999
 GET {{baseUrl}}/orders/{{invalidOrderId}}
 
@@ -562,6 +565,7 @@ GET {{baseUrl}}/orders/{{invalidOrderId}}
 GET {{baseUrl}}/orders/{{orderIdWithInvalidType}}
 
 ### A13 주문 상세 실패 (주문 ID 0) — 기대: 400 VALIDATION_ERROR, fieldErrors.orderId
+### TODO: 404 가 나옴 (get 에 @Positive 가 없어 조회까지 감)
 GET {{baseUrl}}/orders/0
 
 ### A22 주문 메모 수정 (기대: 200, memo 만 바뀐 전체 Order)
@@ -680,11 +684,11 @@ GET {{baseUrl}}/delivery-batches?deliveryDate={{shippingDate}}
 ### A14 배송 묶음 (주문 없는 날짜) — 기대: 200 + []
 GET {{baseUrl}}/delivery-batches?deliveryDate=2026-01-01
 
-### A14 배송 묶음 실패 (날짜 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.shippingDate
+### A14 배송 묶음 실패 (날짜 누락) — 기대: 400 VALIDATION_ERROR, fieldErrors.deliveryDate
 ### TODO: 본문이 Spring 기본 형식 (MissingServletRequestParameterException 미처리)
 GET {{baseUrl}}/delivery-batches
 
-### A14 배송 묶음 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.shippingDate
+### A14 배송 묶음 실패 (날짜 형식) — 기대: 400 VALIDATION_ERROR, fieldErrors.deliveryDate
 ### TODO: 본문이 Spring 기본 형식 (MethodArgumentTypeMismatchException 미처리). 2000~2099 범위 검사도 없음
 GET {{baseUrl}}/delivery-batches?deliveryDate=2026-13-45
 

@@ -18,9 +18,9 @@ class OrderCancelDeadlineTest {
         return OffsetDateTime.parse(time + "+09:00").toInstant();
     }
 
-    private static Order placedOrder(LocalDate shippingDate) {
+    private static Order placedOrder(LocalDate deliveryDate) {
         Order order = new Order();
-        ReflectionTestUtils.setField(order, "deliveryDate", shippingDate);
+        ReflectionTestUtils.setField(order, "deliveryDate", deliveryDate);
         ReflectionTestUtils.setField(order, "status", OrderStatus.PLACED);
         return order;
     }

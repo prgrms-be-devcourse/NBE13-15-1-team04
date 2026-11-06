@@ -1,5 +1,18 @@
 # coffe-prince
 
+## 🏗 시스템 아키텍처
+
+![시스템 아키텍처](./docs/images/coffe-prince-architecture.svg)
+
+## 🗃 데이터베이스 ERD
+
+![ERD](./docs/images/coffe-prince-erd.svg)
+
+본 프로젝트는 카테고리, 메뉴, 주문, 주문 항목의
+4개 테이블을 중심으로 구성되어 있습니다.
+
+자세한 설계 내용은 [ERD 문서](./docs/ERD.md)를 참고해 주세요.
+
 ## 실행 방법 (로컬)
 
 1. 로컬 MySQL을 띄우고 `coffeprince` 데이터베이스를 만듭니다.
@@ -96,3 +109,22 @@ docker exec coffeprince-redis redis-cli TTL menus::all   # 남은 초
 💡 참고
   - Docker가 꼭 필요한 건 아님 (Redis만 6379 포트에 켜져 있으면 됨)
   - Docker로 한 번 띄우면 이후엔 Docker Desktop만 켜져 있으면 자동 실행
+
+## RestClient 외부 게시글 조회
+
+`GET /api/v1/reference/posts/{postId}` → 외부 서버의 `/posts/{postId}`를 조회합니다. (화면 연결 없음)
+
+| 항목 | 내용 |
+|---|---|
+| 외부 주소 | 기본 `https://jsonplaceholder.typicode.com` · 환경 변수 `REFERENCE_BASE_URL`로 변경 |
+| 시간 제한 | 연결 3초 · 응답 읽기 5초 |
+| 오류 | 400 입력 오류 · 404 외부 게시글 없음 · 502 외부 서버 오류/연결 실패 · 504 시간 초과 |
+| 코드 | `ReferencePostController`, `ReferencePostService` |
+
+> **jsonplaceholder**: 명세가 지정한 연습용 공개 API (가짜 게시글 100개 제공)
+
+**테스트** (7가지 경우, 약 10초)
+```bash
+./gradlew test --tests "*ReferencePostControllerTest"
+```
+> 테스트 중에만 **가짜 외부 서버**를 띄워 404·500·연결 실패·시간 초과를 재현합니다. 실제 jsonplaceholder에는 오류를 일으키지 않습니다.
