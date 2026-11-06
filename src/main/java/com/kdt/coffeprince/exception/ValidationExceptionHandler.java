@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.exc.StreamReadException;
 import tools.jackson.databind.exc.MismatchedInputException;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -53,22 +55,24 @@ public class ValidationExceptionHandler {
     }
 
     // @RequestBody JSON 을 읽지 못함
-    //  - JSON 문법 오류: 어느 필드인지 알 수 없으므로 fieldErrors 는 {}
+    //  - JSON 문법 오류(StreamReadException): 어느 필드인지 알 수 없으므로 fieldErrors 는 {}
     //  - 타입 불일치(allow-coercion-of-scalars=false 로 "false"·0 → Boolean 변환 거부 등):
     //    Jackson 이 알려주는 필드 경로를 fieldErrors 의 키로 사용
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException err) {
         Map<String, String> fieldErrors = new LinkedHashMap<>();
-        JacksonException cause = findCause(err, JacksonException.class);
-        if (cause != null && !cause.getPath().isEmpty()) {
-            String field = cause.getPath().getLast().getPropertyName();
-            if (field != null) {
-                fieldErrors.put(field, typeMismatchMessage(cause));
+        if (findCause(err, StreamReadException.class) == null) {
+            JacksonException cause = findCause(err, JacksonException.class);
+            if (cause != null && !cause.getPath().isEmpty()) {
+                String field = toFieldPath(cause.getPath());
+                if (!field.isEmpty()) {
+                    fieldErrors.put(field, typeMismatchMessage(cause));
+                }
             }
         }
         return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
     }
-    
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException err) {
         return ResponseEntity.badRequest().body(
@@ -91,4 +95,19 @@ public class ValidationExceptionHandler {
         }
         return null;
     }
+
+    // Jackson 경로 [items, [0], menuId] → "items[0].menuId" (Bean Validation 의 FieldError 키와 같은 형식)
+    private static String toFieldPath(List<JacksonException.Reference> path) {
+        StringBuilder sb = new StringBuilder();
+        for (JacksonException.Reference ref : path) {
+            if (ref.getPropertyName() != null) {
+                if (!sb.isEmpty()) sb.append('.');
+                sb.append(ref.getPropertyName());
+            } else if (ref.getIndex() >= 0) {
+                sb.append('[').append(ref.getIndex()).append(']');
+            }
+        }
+        return sb.toString();
+    }
+
 }

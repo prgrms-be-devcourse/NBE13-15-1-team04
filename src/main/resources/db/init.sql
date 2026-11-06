@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS orders (
     reorder_source_id BIGINT       NULL,
     customer_email    VARCHAR(100) NOT NULL,
     customer_phone    VARCHAR(20)  NULL,
-    delivery_address  VARCHAR(255) NOT NULL,
+    delivery_address  VARCHAR(200) NOT NULL,
     postcode          VARCHAR(5)   NOT NULL,
     delivery_date     DATE         NOT NULL,
     memo              VARCHAR(255) NULL,

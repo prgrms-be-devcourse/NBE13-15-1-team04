@@ -22,6 +22,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
 
+    public static final int MAX_EMAIL_LENGTH = 100;
+    public static final int MAX_ADDRESS_LENGTH = 200;
+    public static final int MAX_ITEM_SIZE = 10;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
@@ -32,13 +36,13 @@ public class Order {
     @JoinColumn(name = "reorder_source_id", updatable = false)
     private Order reorderSource;
 
-    @Column(name = "customer_email", nullable = false, length = 100)
+    @Column(name = "customer_email", nullable = false, length = MAX_EMAIL_LENGTH)
     private String customerEmail;
 
     @Column(name = "customer_phone", length = 20)
     private String customerPhone;
 
-    @Column(name = "delivery_address", nullable = false)
+    @Column(name = "delivery_address", nullable = false, length = MAX_ADDRESS_LENGTH)
     private String deliveryAddress;
 
     // 우편번호: 숫자 5자리. "01234"처럼 앞의 0을 지키려고 문자열로 저장
