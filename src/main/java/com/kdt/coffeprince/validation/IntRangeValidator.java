@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 class IntRangeValidator implements ConstraintValidator<IntRange, String> {
 
-    private static final Pattern FORMAT = Pattern.compile("\\d{1,9}");   // int 범위 안에서만 파싱
+    private static final Pattern FORMAT = Pattern.compile("0|[1-9]\\d{0,8}");   // 앞자리 0 거절, int 범위 안에서만 파싱
 
     private int min;
     private int max;

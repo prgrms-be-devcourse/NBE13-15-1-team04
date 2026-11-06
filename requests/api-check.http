@@ -708,3 +708,22 @@ GET {{baseUrl}}/statistics/customers?date=2026-01-01
 
 ### A24 접수일별 고객 통계 실패 (미래 날짜) — 기대: 400 VALIDATION_ERROR
 GET {{baseUrl}}/statistics/customers?date=2099-01-01
+
+# ---------------------------------------------------------------------------------------------------
+# 선택 심화 — 별도 메뉴 페이징 API (명세 9절). 필수 24개에는 포함되지 않는 검증용 요청입니다.
+# ---------------------------------------------------------------------------------------------------
+
+### [심화] 메뉴 페이징 조회 (기대: 200, content·number·size·totalElements·totalPages / 판매 중지 메뉴 포함, ID 오름차순)
+GET {{baseUrl}}/menus/page?page=0&size=2
+
+### [심화] 메뉴 페이징 조회 (파라미터 생략) — 기대: 200, number=0·size=10
+GET {{baseUrl}}/menus/page
+
+### [심화] 메뉴 페이징 조회 (범위 초과 페이지) — 기대: 200, content=[] 와 실제 totalElements·totalPages
+GET {{baseUrl}}/menus/page?page=99&size=2
+
+### [심화] 메뉴 페이징 조회 실패 (page 정수 아님) — 기대: 400 VALIDATION_ERROR, fieldErrors.page
+GET {{baseUrl}}/menus/page?page=abc
+
+### [심화] 메뉴 페이징 조회 실패 (size 범위 초과) — 기대: 400 VALIDATION_ERROR, fieldErrors.size (1~50)
+GET {{baseUrl}}/menus/page?size=51

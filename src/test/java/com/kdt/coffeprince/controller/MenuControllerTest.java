@@ -251,9 +251,9 @@ class MenuControllerTest {
     }
 
     @Test
-    @DisplayName("페이징: page 가 음수·소수·문자면 400 VALIDATION_ERROR 와 fieldErrors.page 를 반환한다")
+    @DisplayName("페이징: page 가 음수·소수·문자·앞자리 0 이면 400 VALIDATION_ERROR 와 fieldErrors.page 를 반환한다")
     void 페이징_page가_잘못되면_400을_반환한다() throws Exception {
-        for (String page : List.of("-1", "1.5", "abc", "9999999999")) {
+        for (String page : List.of("-1", "1.5", "abc", "007", "9999999999")) {
             mockMvc.perform(get("/api/v1/menus/page").param("page", page))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))

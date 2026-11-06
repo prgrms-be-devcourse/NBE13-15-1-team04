@@ -80,6 +80,7 @@ MySQL에 주문과 상품 데이터를 저장하며, 반복적으로 요청되�
 | 통계 | GET | `/statistics/menus?date={date}` | 메뉴 통계 |
 | 통계 | GET | `/statistics/customers?date={date}` | 고객 통계 |
 | 선택 심화 | GET | `/reference/posts/{postId}` | 외부 게시글 조회 |
+| 선택 심화 | GET | `/menus/page?page={page}&size={size}` | 전체 메뉴 페이지별 조회 |
 
 ### 대표 요청 예시: 메뉴 등록
 
