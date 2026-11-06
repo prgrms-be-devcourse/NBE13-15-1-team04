@@ -1,6 +1,6 @@
 # ERD
 
-`TODO.md`의 항목까지 반영된 **최종 구조** 기준입니다. 현재 코드와 다른 부분은 `TODO.md`를 참고하세요.
+현재 코드(엔티티·`init.sql`) 기준입니다.
 
 ```mermaid
 erDiagram
@@ -72,9 +72,9 @@ erDiagram
 | 시각 타입 | `DATETIME` → `Instant`, `DATE` → `LocalDate` |
 | `created_at` / `ordered_at` | JPA Auditing `@CreatedDate`, `updatable = false` |
 | `updated_at` | JPA Auditing `@LastModifiedDate`. DB에 `ON UPDATE CURRENT_TIMESTAMP`가 없으므로 애플리케이션이 채움 |
-| `canceled_at` | Auditing이 아닌 취소 로직에서 `status`와 함께 설정 (도메인 메서드는 추후 작성, `TODO.md`) |
+| `canceled_at` | Auditing이 아닌 취소 로직(`Order.cancel`)에서 `status`와 함께 설정 |
 | `orders.status` | `@Enumerated(EnumType.STRING)`, `constant/OrderStatus` (`PLACED`, `CANCELED`) |
-| `orders.total_amount` | `order_item.unit_price × quantity` 합계. 항목 추가 시 함께 갱신 (도메인 메서드는 추후 작성, `TODO.md`) |
+| `orders.total_amount` | `order_item.unit_price × quantity` 합계. 항목 추가(`Order.addItem`) 시 함께 갱신 |
 | `order_item.menu_name` / `unit_price` | `OrderItem` 생성 시 `Menu`에서 복사. 이후 메뉴 변경과 무관 |
 | 연관관계 주인 | `menu.category` → `Category.menus`(mappedBy), `order_item.order` → `Order.items`(mappedBy). `order_item.menu`, `orders.reorder_source`는 단방향 |
 | fetch | 모든 `@ManyToOne`은 `LAZY`. 응답은 엔티티 대신 DTO(`record` + `from()`)로 변환 |
