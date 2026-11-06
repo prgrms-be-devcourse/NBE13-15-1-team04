@@ -1,5 +1,9 @@
 # coffe-prince
 
+## 🏗 시스템 아키텍처
+
+![시스템 아키텍처](./docs/images/coffe-prince-architecture.svg)
+
 ## 실행 방법 (로컬)
 
 1. 로컬 MySQL을 띄우고 `coffeprince` 데이터베이스를 만듭니다.
