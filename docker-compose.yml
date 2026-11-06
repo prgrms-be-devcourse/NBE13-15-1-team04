@@ -11,7 +11,8 @@ services:
       TZ: Asia/Seoul
     command:
       - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+      # 카테고리명 중복·메뉴명 검색·이메일 비교가 대소문자를 구분하도록 DB 기본 콜레이션을 utf8mb4_bin 으로 통일
+      - --collation-server=utf8mb4_bin
     volumes:
       - mysql-data:/var/lib/mysql
 

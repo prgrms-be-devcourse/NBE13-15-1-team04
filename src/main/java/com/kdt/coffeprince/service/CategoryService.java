@@ -47,7 +47,7 @@ public class CategoryService {
     public CategoryResponse create(CategoryRequest request) {
         String name = request.name();
 
-        if (categoryRepository.countSameNameExactly(name) > 0) {
+        if (categoryRepository.countByName(name) > 0) {
             throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED);
         }
 
@@ -60,7 +60,7 @@ public class CategoryService {
         Category category = categoryRepository.getOrThrow(categoryId);
         String name = request.name();
 
-        if (categoryRepository.countSameNameExactly(name, categoryId) > 0) {
+        if (categoryRepository.countByNameAndCategoryIdNot(name, categoryId) > 0) {
             throw new BusinessException(ErrorCode.CATEGORY_NAME_DUPLICATED);
         }
 

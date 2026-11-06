@@ -14,15 +14,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByOrderByCategoryIdAsc();
 
-    // A03: 대소문자까지 똑같은 이름의 개수 (테이블 기본 콜레이션은 Decaf와 decaf를 같게 보므로 utf8mb4_bin 으로 비교)
-    @Query(value = "SELECT COUNT(*) FROM category WHERE name COLLATE utf8mb4_bin = :name",
-            nativeQuery = true)
-    long countSameNameExactly(@Param("name") String name);
+    // A03: 같은 이름의 개수. 대소문자 구분은 DB 콜레이션(utf8mb4_bin)이 담당한다 (docker-compose.yml·init.sql·README)
+    long countByName(String name);
 
     // A04: 위와 같되 자기 자신은 제외
-    @Query(value = "SELECT COUNT(*) FROM category WHERE name COLLATE utf8mb4_bin = :name AND category_id <> :id",
-            nativeQuery = true)
-    long countSameNameExactly(@Param("name") String name, @Param("id") Long id);
+    long countByNameAndCategoryIdNot(String name, Long categoryId);
 
     // A05: 카테고리만 바로 삭제 (cascade로 menu 테이블을 읽지 않도록)
     @Modifying

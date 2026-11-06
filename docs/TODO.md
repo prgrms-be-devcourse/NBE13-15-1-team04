@@ -79,14 +79,14 @@
 
 ### 명세와 다른 것
 
-- [ ] **A06·A19 메뉴 목록 정렬 없음** — `MenuService.all()`은 `findAll()`, `available()`은 `findByIsAvailableTrue()`로 `ORDER BY` 없이 조회.
+- [x] **A06·A19 메뉴 목록 정렬 없음** — `MenuService.all()`은 `findAll()`, `available()`은 `findByIsAvailableTrue()`로 `ORDER BY` 없이 조회. (#44 `findAllByOrderByMenuIdAsc`·`findByIsAvailableTrueOrderByMenuIdAsc`)
   명세는 ID 오름차순. Category(`findAllByOrderByCategoryIdAsc`)·A15(`OrderByMenuIdAsc`)처럼 정렬을 명시할 것
-- [ ] **A20 검색어의 `%`·`_` 가 LIKE 와일드카드로 동작** — `searchByNameExactCase`가 `LIKE CONCAT('%', :keyword, '%')`라
+- [x] **A20 검색어의 `%`·`_` 가 LIKE 와일드카드로 동작** — `searchByNameExactCase`가 `LIKE CONCAT('%', :keyword, '%')`라 (#44 Spring Data `Containing` 으로 교체, 와일드카드 자동 이스케이프)
   `50%` 검색이 "50 으로 시작하는 전부"에 매칭됨. 검색어를 이스케이프(`ESCAPE '\\'`)해서 "포함" 검색으로 맞출 것
 
 ### 세 영역 사이의 일관성
 
-- [ ] `MenuSearchRequest`만 `@Size(max = 100)` 리터럴 → `Menu.MAX_NAME_LENGTH` 참조로 통일
+- [x] `MenuSearchRequest`만 `@Size(max = 100)` 리터럴 → `Menu.MAX_NAME_LENGTH` 참조로 통일 (#44)
 - [ ] 읽기 트랜잭션: Order 조회는 전부 `@Transactional(readOnly = true)`인데 Menu는 `searchMenus()`만, Category는 없음.
   `Menu.category`가 LAZY라 응답에 카테고리 이름을 추가하는 순간 `open-in-view=false`에서 500 → 조회 메서드에 모두 붙일 것
 - [ ] 컨트롤러 주입 방식: `CategoryController`만 생성자 직접 작성, 나머지는 `@RequiredArgsConstructor`
@@ -97,6 +97,7 @@
 
 ### 남아 있는 잔재
 
-- [ ] `MenuService`의 미사용 `NotFoundException` import 제거
+- [x] `MenuService`의 미사용 `NotFoundException` import 제거 (#44)
 - [ ] `NotFoundException`·`ApiError`·`ApiExceptionAdvice`는 더 이상 쓰는 곳이 없음 (Statistics 의 `BadRequestException` 도 #53 에서 제거) → #51 에서 삭제
 - [ ] `CategoryOrderExceptionHandler`(Order·DeliveryBatches 한정, 주석 처리된 `handleNotReadable` 포함) → #51에서 전역 핸들러로 흡수 후 삭제
+- [x] 대소문자 구분을 쿼리 `COLLATE utf8mb4_bin` 대신 DB 콜레이션으로 통일 (docker-compose·init.sql·README, 네이티브 쿼리 → 파생 쿼리) (#44)

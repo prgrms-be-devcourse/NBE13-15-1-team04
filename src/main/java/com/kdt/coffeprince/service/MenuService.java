@@ -8,7 +8,6 @@ import com.kdt.coffeprince.entity.Category;
 import com.kdt.coffeprince.entity.Menu;
 import com.kdt.coffeprince.exception.BusinessException;
 import com.kdt.coffeprince.exception.ErrorCode;
-import com.kdt.coffeprince.exception.NotFoundException;
 import com.kdt.coffeprince.repository.CategoryRepository;
 import com.kdt.coffeprince.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class MenuService {
     // A06 캐시: Redis 키 "menus::all" 에 저장, TTL 동안 DB 재조회 안 함
     @Cacheable(cacheNames = RedisCacheConfig.MENUS, key = "'all'")
     public List<MenuResponse> all() {
-        return menuRepository.findAll()
+        return menuRepository.findAllByOrderByMenuIdAsc()
                 .stream()
                 .map(MenuResponse::from)
                 .toList();
@@ -57,7 +56,7 @@ public class MenuService {
     }
 
     public List<MenuResponse> available() {
-        return menuRepository.findByIsAvailableTrue()
+        return menuRepository.findByIsAvailableTrueOrderByMenuIdAsc()
                 .stream()
                 .map(MenuResponse::from)
                 .toList();
@@ -101,7 +100,7 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public List<MenuResponse> searchMenus(String name) {
-        return menuRepository.searchByNameExactCase(name)
+        return menuRepository.findByNameContainingOrderByMenuIdAsc(name)
                 .stream()
                 .map(MenuResponse::from)
                 .toList();

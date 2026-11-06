@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS category (
     created_at  DATETIME(6)  NOT NULL,
     updated_at  DATETIME(6)  NOT NULL,
     PRIMARY KEY (category_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE IF NOT EXISTS menu (
     menu_id      BIGINT       NOT NULL AUTO_INCREMENT,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS menu (
     updated_at   DATETIME(6)  NOT NULL,
     PRIMARY KEY (menu_id),
     CONSTRAINT fk_menu_category FOREIGN KEY (category_id) REFERENCES category (category_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE IF NOT EXISTS orders (
     order_id          BIGINT       NOT NULL AUTO_INCREMENT,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS orders (
     INDEX idx_orders_delivery_date  (delivery_date, status),
     INDEX idx_orders_ordered_at     (ordered_at),
     CONSTRAINT fk_orders_reorder_source FOREIGN KEY (reorder_source_id) REFERENCES orders (order_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE IF NOT EXISTS order_item (
     order_item_id BIGINT       NOT NULL AUTO_INCREMENT,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS order_item (
     PRIMARY KEY (order_item_id),
     CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES orders (order_id),
     CONSTRAINT fk_order_item_menu  FOREIGN KEY (menu_id)  REFERENCES menu (menu_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 INSERT INTO category (category_id, name, created_at, updated_at) VALUES
     (1, 'Single Origin', NOW(6), NOW(6)),

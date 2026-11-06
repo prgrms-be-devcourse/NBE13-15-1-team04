@@ -182,8 +182,19 @@ docker compose --env-file local.env up -d mysql redis
 이미 MySQL을 실행 중이라면 다음 데이터베이스를 생성합니다.
 
 ```sql
-CREATE DATABASE IF NOT EXISTS coffeprince CHARACTER SET utf8mb4;
+CREATE DATABASE IF NOT EXISTS coffeprince CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 ```
+
+> 콜레이션은 `utf8mb4_bin`이어야 합니다. 카테고리명 중복 검사·메뉴명 검색·이메일 비교가 대소문자를 구분하는 명세를 DB 설정으로 맞추기 때문입니다.
+> 이미 `utf8mb4_unicode_ci` 등으로 만든 DB가 있다면 아래로 전환합니다.
+>
+> ```sql
+> ALTER DATABASE coffeprince COLLATE utf8mb4_bin;
+> ALTER TABLE category   CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+> ALTER TABLE menu       CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+> ALTER TABLE orders     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+> ALTER TABLE order_item CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+> ```
 
 프로젝트 루트의 `local.env`에 실제 MySQL 접속 정보를 입력한 후 애플리케이션을 실행합니다.
 
