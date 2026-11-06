@@ -2,9 +2,9 @@ package com.kdt.coffeprince.controller;
 
 import com.kdt.coffeprince.dto.DeliveryBatchResponse;
 import com.kdt.coffeprince.service.OrderService;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.kdt.coffeprince.validation.UrlDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +21,10 @@ public class DeliveryBatchesController {
 
     @GetMapping                                            // A14
     public List<DeliveryBatchResponse> list(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deliveryDate) {
-        return orderService.findDeliveryBatches(deliveryDate);
+            @RequestParam
+            @UrlDate
+            String shippingDate
+    ) {
+        return orderService.findDeliveryBatches(LocalDate.parse(shippingDate));
     }
 }

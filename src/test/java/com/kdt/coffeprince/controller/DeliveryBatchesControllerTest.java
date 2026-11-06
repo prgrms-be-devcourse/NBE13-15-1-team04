@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// A14 배송 묶음 — 날짜 누락·형식 오류가 명세 형식(VALIDATION_ERROR + fieldErrors.deliveryDate)인지 확인
+// A14 배송 묶음 — 날짜 누락·형식 오류가 명세 형식(VALIDATION_ERROR + fieldErrors.shippingDate)인지 확인
 @WebMvcTest(DeliveryBatchesController.class)
 class DeliveryBatchesControllerTest {
 
@@ -30,33 +30,33 @@ class DeliveryBatchesControllerTest {
     private OrderService orderService;
 
     @Test
-    @DisplayName("A14: deliveryDate로 조회하면 200을 반환한다")
+    @DisplayName("A14: shippingDate로 조회하면 200을 반환한다")
     void 배송일로_조회하면_200을_반환한다() throws Exception {
         when(orderService.findDeliveryBatches(LocalDate.of(2026, 11, 3))).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/v1/delivery-batches").param("deliveryDate", "2026-11-03"))
+        mockMvc.perform(get("/api/v1/delivery-batches").param("shippingDate", "2026-11-03"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
-    @DisplayName("A14: 날짜가 없으면 400 VALIDATION_ERROR와 fieldErrors.deliveryDate를 반환한다")
+    @DisplayName("A14: 날짜가 없으면 400 VALIDATION_ERROR와 fieldErrors.shippingDate를 반환한다")
     void 날짜가_없으면_400을_반환한다() throws Exception {
         mockMvc.perform(get("/api/v1/delivery-batches"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.fieldErrors.deliveryDate").exists());
+                .andExpect(jsonPath("$.fieldErrors.shippingDate").exists());
 
         verify(orderService, never()).findDeliveryBatches(any());
     }
 
     @Test
-    @DisplayName("A14: 날짜 형식이 틀리면 400 VALIDATION_ERROR와 fieldErrors.deliveryDate를 반환한다")
+    @DisplayName("A14: 날짜 형식이 틀리면 400 VALIDATION_ERROR와 fieldErrors.shippingDate를 반환한다")
     void 날짜_형식이_틀리면_400을_반환한다() throws Exception {
-        mockMvc.perform(get("/api/v1/delivery-batches").param("deliveryDate", "2026-13-45"))
+        mockMvc.perform(get("/api/v1/delivery-batches").param("shippingDate", "2026-13-45"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.fieldErrors.deliveryDate").exists());
+                .andExpect(jsonPath("$.fieldErrors.shippingDate").exists());
 
         verify(orderService, never()).findDeliveryBatches(any());
     }

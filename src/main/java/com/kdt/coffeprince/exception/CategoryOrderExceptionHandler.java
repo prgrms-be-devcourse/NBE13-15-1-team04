@@ -16,9 +16,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -77,15 +75,15 @@ public class CategoryOrderExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.VALIDATION_ERROR, fieldErrors));
     }
 
-    // 400: 경로 ID가 숫자가 아님(예: /categories/abc) 또는 날짜 형식 오류(예: ?deliveryDate=2026-13-45)
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException err) {
-        String message = LocalDate.class.equals(err.getRequiredType())
-                ? "yyyy-MM-dd 형식의 날짜여야 합니다."
-                : "1 이상의 정수여야 합니다.";
-        return ResponseEntity.badRequest().body(
-                ErrorResponse.of(ErrorCode.VALIDATION_ERROR, Map.of(err.getName(), message)));
-    }
+//    // 400: 경로 ID가 숫자가 아님(예: /categories/abc) 또는 날짜 형식 오류(예: ?deliveryDate=2026-13-45)
+//    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+//    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException err) {
+//        String message = LocalDate.class.equals(err.getRequiredType())
+//                ? "yyyy-MM-dd 형식의 날짜여야 합니다."
+//                : "1 이상의 정수여야 합니다.";
+//        return ResponseEntity.badRequest().body(
+//                ErrorResponse.of(ErrorCode.VALIDATION_ERROR, Map.of(err.getName(), message)));
+//    }
 
     // 400: 필수 쿼리 파라미터 누락. 예: /delivery-batches (deliveryDate 없음)
     @ExceptionHandler(MissingServletRequestParameterException.class)
