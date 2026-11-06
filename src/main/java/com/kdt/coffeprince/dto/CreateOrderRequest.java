@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.List;
 
-public record OrderCreateRequest(
+public record CreateOrderRequest(
         @CustomerEmail
         String email,
 
@@ -30,7 +30,7 @@ public record OrderCreateRequest(
         @Valid
         List<@NotNull(message = "{NotNull.item}") OrderItemRequest> items
 ) {
-    public OrderCreateRequest {
+    public CreateOrderRequest {
         if (address != null) {
             address = address.trim();
         }

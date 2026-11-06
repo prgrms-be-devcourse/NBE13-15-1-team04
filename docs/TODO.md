@@ -51,7 +51,7 @@
 - [x] **A12 쿼리**: 명세 `email` ↔ 구현 `customerEmail` (#47)
 - [x] **A12 응답 필드**: `id·orderedAt·deliveryDate` 로 교체, `status` 는 `CANCELLED` 로 변환 (#47)
 - [x] **A14 쿼리**: 명세대로 `shippingDate` 유지 (A14 쿼리·응답에서만 사용, 주문 엔티티·서비스·주문 응답은 `deliveryDate`)
-    - 주문 응답(`OrderResponse`·`OrderSummaryResponse`)의 `deliveryDate` 가 명세 `shippingDate` 와 다른지 명세 원문 확인 필요
+    - 주문 응답(`OrderResponse`·`OrderSummaryResponse`)도 명세대로 `createdAt`·`shippingDate` 로 교체 (#52)
 - [x] **A20 쿼리**: 명세 `keyword` ↔ 구현 `name`. 명세는 영문 대소문자 구분인데 구현은 `IgnoreCase` (#44 `keyword` + `COLLATE utf8mb4_bin`)
 
 ## 4. 명세 입력 검사 중 빠진 것
@@ -72,7 +72,7 @@
     - 검증 흐름은 그대로: trim 후 `@NotBlank`·`@Size` → `MethodArgumentNotValidException` → `ValidationExceptionHandler`
     - `{"name": 1}` 같은 자료형 오류는 현재 Jackson 이 `"1"` 로 변환해 통과시킴. 막으려면 역직렬화기에서 `VALUE_STRING` 토큰 검사
       추가 (전역은 `coercionConfigFor(LogicalType.Textual)` 설정). 널널하게 보기로 하여 당장은 적용 안 함
-    - `OrderService` 는 #52 에서 Reorder 와 통합됐고 요청 DTO 의 trim 은 `OrderCreateRequest` 컴팩트 생성자로 옮김.
+    - `OrderService` 는 #52 에서 Reorder 와 통합됐고 요청 DTO 의 trim 은 `CreateOrderRequest` 컴팩트 생성자로 옮김.
       재주문·배송지 비교의 `trim()` 은 엔티티 값 대상이라 그대로 둠
 
 ## 6. Menu·Category·Order 리팩토링 후 전체 점검에서 발견한 것 (2026-11-06)

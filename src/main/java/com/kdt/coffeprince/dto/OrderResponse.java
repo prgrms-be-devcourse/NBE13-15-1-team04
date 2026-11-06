@@ -15,8 +15,8 @@ public record OrderResponse(
         String email,
         String address,
         String postcode,
-        String orderedAt,
-        String deliveryDate,
+        String createdAt,
+        String shippingDate,
         Integer totalAmount,
         List<OrderItemResponse> items,
         String status,
@@ -54,4 +54,4 @@ public record OrderResponse(
     static String toResponseStatus(OrderStatus status) {
         return status == OrderStatus.CANCELED ? "CANCELLED" : status.name();
     }
-}
+}

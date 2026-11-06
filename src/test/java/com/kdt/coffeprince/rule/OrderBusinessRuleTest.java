@@ -1,6 +1,6 @@
 package com.kdt.coffeprince.rule;
 
-import com.kdt.coffeprince.dto.OrderCreateRequest;
+import com.kdt.coffeprince.dto.CreateOrderRequest;
 import com.kdt.coffeprince.dto.OrderItemRequest;
 import com.kdt.coffeprince.dto.OrderResponse;
 import com.kdt.coffeprince.exception.BusinessException;
@@ -56,7 +56,7 @@ class OrderBusinessRuleTest {
     private OrderResponse placeAt(int year, int mon, int day, int hour, int min, int sec,
                                   String email, int qty) {
         clock.set(year, mon, day, hour, min, sec);
-        return orderService.place(new OrderCreateRequest(
+        return orderService.place(new CreateOrderRequest(
                 email, ADDRESS, POSTCODE,
                 List.of(new OrderItemRequest(MENU_ID, qty))));
     }
@@ -78,7 +78,7 @@ class OrderBusinessRuleTest {
         void beforeCutoff() {
             OrderResponse order = placeAt(2030, 5, 10, 13, 59, 59, "rule-dayTest1@test.com", 1);
 
-            assertThat(order.deliveryDate()).isEqualTo(LocalDate.of(2030, 5, 10).toString());
+            assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2030, 5, 10).toString());
         }
 
         @Test
@@ -86,7 +86,7 @@ class OrderBusinessRuleTest {
         void atCutoff() {
             OrderResponse order = placeAt(2030, 5, 10, 14, 0, 0, "rule-dayTest2@test.com", 1);
 
-            assertThat(order.deliveryDate()).isEqualTo(LocalDate.of(2030, 5, 11).toString());
+            assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2030, 5, 11).toString());
         }
 
         @Test
@@ -94,7 +94,7 @@ class OrderBusinessRuleTest {
         void afterCutoff() {
             OrderResponse order = placeAt(2030, 5, 10, 14, 0, 1, "rule-dayTest3@test.com", 1);
 
-            assertThat(order.deliveryDate()).isEqualTo(LocalDate.of(2030, 5, 11).toString());
+            assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2030, 5, 11).toString());
         }
 
         @Test
@@ -102,7 +102,7 @@ class OrderBusinessRuleTest {
         void yearEnd() {
             OrderResponse order = placeAt(2030, 12, 31, 14, 0, 0, "rule-dayTest4@test.com", 1);
 
-            assertThat(order.deliveryDate()).isEqualTo(LocalDate.of(2031, 1, 1).toString());
+            assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2031, 1, 1).toString());
         }
     }
 
@@ -139,7 +139,7 @@ class OrderBusinessRuleTest {
         @DisplayName("마감 기준은 접수일이 아니라 배송일 (5/10 15:00 접수 → 배송일 5/11 → 5/11 13:59:59까지 취소 가능)")
         void deadlineUsesDeliveryDate() {
             OrderResponse order = placeAt(2030, 5, 10, 15, 0, 0, "rule-cancelTest3@test.com", 1);
-            assertThat(order.deliveryDate()).isEqualTo(LocalDate.of(2030, 5, 11).toString());
+            assertThat(order.shippingDate()).isEqualTo(LocalDate.of(2030, 5, 11).toString());
 
             clock.set(2030, 5, 11, 13, 59, 59);
 

@@ -2,7 +2,7 @@ package com.kdt.coffeprince.service;
 
 import com.kdt.coffeprince.constant.OrderStatus;
 import com.kdt.coffeprince.dto.DeliveryBatchResponse;
-import com.kdt.coffeprince.dto.OrderCreateRequest;
+import com.kdt.coffeprince.dto.CreateOrderRequest;
 import com.kdt.coffeprince.dto.OrderResponse;
 import com.kdt.coffeprince.dto.OrderSummaryResponse;
 import com.kdt.coffeprince.entity.Menu;
@@ -44,7 +44,7 @@ public class OrderService {
 
     // ---------- A11 주문 접수 ----------
     @Transactional
-    public OrderResponse place(OrderCreateRequest request) {
+    public OrderResponse place(CreateOrderRequest request) {
         List<Line> lines = request.items().stream()
                 .map(item -> new Line(item.menuId(), item.quantity()))
                 .toList();
