@@ -20,7 +20,12 @@ public enum ErrorCode {
     MENU_IN_USE(HttpStatus.CONFLICT, "주문에 사용된 메뉴는 삭제할 수 없습니다."),
     ADDRESS_MISMATCH(HttpStatus.CONFLICT, "같은 이메일과 배송일의 기존 주문과 배송지가 다릅니다."),
     ORDER_NOT_CANCELLABLE(HttpStatus.CONFLICT, "배송 대상일 14시 전의 접수 상태 주문만 취소할 수 있습니다."),
-    MENU_UNAVAILABLE(HttpStatus.CONFLICT, "판매 중지된 메뉴가 포함되어 있습니다.");
+    MENU_UNAVAILABLE(HttpStatus.CONFLICT, "판매 중지된 메뉴가 포함되어 있습니다."),
+
+    // 선택 심화: RestClient 외부 게시글 조회 (GET /api/v1/reference/posts/{postId})
+    REFERENCE_POST_NOT_FOUND(HttpStatus.NOT_FOUND, "외부 게시글을 찾을 수 없습니다."),
+    OUTSIDE_API_FAILED(HttpStatus.BAD_GATEWAY, "외부 서버를 호출하지 못했습니다."),
+    OUTSIDE_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "외부 서버의 응답 시간이 초과되었습니다.");
 
     private final HttpStatus status;
     private final String message;

@@ -15,3 +15,7 @@ spring:
   jackson:
     mapper:
       allow-coercion-of-scalars: false
+
+# 선택 심화: RestClient 외부 게시글 조회 대상 주소 (환경 변수 REFERENCE_BASE_URL 로 변경 가능)
+reference:
+  base-url: ${REFERENCE_BASE_URL:https://jsonplaceholder.typicode.com}
