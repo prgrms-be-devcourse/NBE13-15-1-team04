@@ -6,9 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-// BusinessException을 명세 형식 {code, message, fieldErrors}로 응답한다
-// 모든 Controller에 적용되지만, BusinessException을 직접 던진 API에만 영향이 있다
-// (현재 A04·A05·A15·A16·A21·A22). 팀 공통 틀이 정해지면 ApiExceptionAdvice와 합칠 예정
+// BusinessException(404·409, 그리고 서비스가 직접 던지는 400)을 명세 형식 {code, message, fieldErrors}로 응답한다
+// Spring 이 던지는 입력 오류(400)는 ValidationExceptionHandler 가 담당한다
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class BusinessExceptionHandler {
