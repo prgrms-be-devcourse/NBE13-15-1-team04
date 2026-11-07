@@ -128,7 +128,7 @@ class OrderBusinessRuleTest {
             clock.set(2030, 5, 10, 13, 59, 59);
             OrderResponse cancelled = orderService.cancel(order.id());
 
-            assertThat(cancelled.status()).isEqualTo("주문취소");
+            assertThat(cancelled.status()).isEqualTo("CANCELLED");
             assertThat(cancelled.cancelledAt()).isNotNull();
             assertThat(cancelled.totalAmount()).isEqualTo(order.totalAmount());
             assertThat(cancelled.items()).hasSameSizeAs(order.items());
@@ -152,7 +152,7 @@ class OrderBusinessRuleTest {
 
             clock.set(2030, 5, 11, 13, 59, 59);
 
-            assertThat(orderService.cancel(order.id()).status()).isEqualTo("주문취소");
+            assertThat(orderService.cancel(order.id()).status()).isEqualTo("CANCELLED");
         }
     }
 
@@ -172,7 +172,7 @@ class OrderBusinessRuleTest {
             clock.set(2030, 5, 10, 15, 0, 0); // 마감(14:00) 이후
             OrderResponse again = orderService.cancel(order.id()); // 예외 없이 성공해야 한다
 
-            assertThat(again.status()).isEqualTo("주문 취소");
+            assertThat(again.status()).isEqualTo("CANCELLED");
             assertThat(again.cancelledAt()).isEqualTo(first.cancelledAt());
             assertThat(again.totalAmount()).isEqualTo(order.totalAmount());
             assertThat(again.items()).hasSameSizeAs(order.items());
