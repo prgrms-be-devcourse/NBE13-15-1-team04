@@ -79,7 +79,8 @@ ON DUPLICATE KEY UPDATE
 -- 주문·주문 상세 초기 데이터 (#56)
 --  - 날짜는 적재 시점 기준 상대값으로 계산해 재실행해도 "미래 배송일" 주문이 유지되도록 함
 --    · delivery_date: 서울 기준 날짜(CURDATE(), docker-compose 의 MySQL TZ=Asia/Seoul)
---    · ordered_at·canceled_at·updated_at: JPA 가 Instant 를 UTC 로 저장하므로 UTC_TIMESTAMP(6) 사용
+--    · ordered_at·canceled_at·updated_at: JPA 가 Instant 를 UTC 로 저장하므로 UTC_TIMESTAMP 사용
+--    · ordered_at 은 OrderService 가 초 단위로 절삭해 저장하므로 시드도 UTC_TIMESTAMP() (소수점 없음) 로 맞춤
 --  - 같은 이메일·배송일의 PLACED 주문은 주소·우편번호가 같아야 함 (OrderService.validateSameAddress)
 --  - 1: buyer / 지난 배송 (PLACED)
 --  - 2: buyer / 내일 배송 (PLACED, 취소 가능)
@@ -92,22 +93,22 @@ INSERT INTO orders (order_id, reorder_source_id, customer_email, customer_phone,
                     delivery_date, memo, status, total_amount, ordered_at, canceled_at, updated_at) VALUES
     (1, NULL, 'buyer@example.com', NULL,            '서울특별시 강남구 테헤란로 123 4층', '06234',
         DATE_SUB(CURDATE(), INTERVAL 3 DAY), '',                   'PLACED',   17000,
-        DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 3 DAY), NULL,                              DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 3 DAY)),
+        DATE_SUB(UTC_TIMESTAMP(), INTERVAL 3 DAY), NULL,                              DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 3 DAY)),
     (2, NULL, 'buyer@example.com', NULL,            '서울특별시 강남구 테헤란로 123 4층', '06234',
         DATE_ADD(CURDATE(), INTERVAL 1 DAY), '',                   'PLACED',   20000,
-        DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 2 HOUR), NULL,                             DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 2 HOUR)),
+        DATE_SUB(UTC_TIMESTAMP(), INTERVAL 2 HOUR), NULL,                             DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 2 HOUR)),
     (3, NULL, 'buyer@example.com', NULL,            '서울특별시 강남구 테헤란로 123 4층', '06234',
         DATE_SUB(CURDATE(), INTERVAL 1 DAY), '',                   'CANCELED', 5000,
-        DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 2 DAY), DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 47 HOUR), DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 47 HOUR)),
+        DATE_SUB(UTC_TIMESTAMP(), INTERVAL 2 DAY), DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 47 HOUR), DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 47 HOUR)),
     (4, 1,    'buyer@example.com', NULL,            '서울특별시 강남구 테헤란로 123 4층', '06234',
         DATE_ADD(CURDATE(), INTERVAL 1 DAY), '',                   'PLACED',   17000,
-        DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 1 HOUR), NULL,                             DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 1 HOUR)),
+        DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 HOUR), NULL,                             DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 1 HOUR)),
     (5, NULL, 'other@example.com', '010-1234-5678', '경기도 성남시 분당구 판교역로 235',   '13494',
         DATE_ADD(CURDATE(), INTERVAL 1 DAY), '부재 시 경비실에 맡겨 주세요', 'PLACED', 21000,
-        DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 30 MINUTE), NULL,                          DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 30 MINUTE)),
+        DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 MINUTE), NULL,                          DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 30 MINUTE)),
     (6, NULL, 'other@example.com', '010-1234-5678', '경기도 성남시 분당구 판교역로 235',   '13494',
         CURDATE(),                           '',                   'PLACED',   16000,
-        DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 1 DAY), NULL,                              DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 1 DAY))
+        DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 DAY), NULL,                              DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 1 DAY))
 ON DUPLICATE KEY UPDATE
     reorder_source_id = VALUES(reorder_source_id),
     customer_email    = VALUES(customer_email),

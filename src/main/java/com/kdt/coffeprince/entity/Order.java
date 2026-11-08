@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -64,7 +63,8 @@ public class Order {
     @Column(name = "total_amount", nullable = false)
     private Integer totalAmount = 0;
 
-    @CreatedDate
+    // 접수 시각은 Auditing(@CreatedDate)이 아니라 서비스가 Clock 으로 계산해 place() 로 넘긴 값을 그대로 저장
+    // (Auditing 이 덮어쓰면 테스트 Clock·초 단위 절삭이 무시되므로 제외)
     @Column(name = "ordered_at", nullable = false, updatable = false)
     private Instant orderedAt;
 
