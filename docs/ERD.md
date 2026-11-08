@@ -70,7 +70,8 @@ erDiagram
 | PK 생성 | 모든 엔티티 `IDENTITY` 전략. DB에 `AUTO_INCREMENT` 필요 |
 | PK 필드명 | `xxxId` 규칙 (`categoryId`, `menuId`, `orderId`, `orderItemId`) |
 | 시각 타입 | `DATETIME` → `Instant`, `DATE` → `LocalDate` |
-| `created_at` / `ordered_at` | JPA Auditing `@CreatedDate`, `updatable = false` |
+| `created_at` | JPA Auditing `@CreatedDate`, `updatable = false` |
+| `ordered_at` | Auditing 미사용. `OrderService` 가 `Clock` 으로 계산한 접수 시각(초 단위 절삭)을 `Order.place()` 로 전달해 저장, `updatable = false` |
 | `updated_at` | JPA Auditing `@LastModifiedDate`. DB에 `ON UPDATE CURRENT_TIMESTAMP`가 없으므로 애플리케이션이 채움 |
 | `canceled_at` | Auditing이 아닌 취소 로직(`Order.cancel`)에서 `status`와 함께 설정 |
 | `orders.status` | `@Enumerated(EnumType.STRING)`, `constant/OrderStatus` (`PLACED`, `CANCELED`) |
